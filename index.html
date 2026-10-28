@@ -45,6 +45,16 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:#00a884;colo
 .tile span{position:absolute;left:8px;bottom:6px;color:#fff;background:rgba(0,0,0,.5);padding:2px 8px;border-radius:10px;font-size:12px}
 #ctl{display:flex;justify-content:center;gap:16px;padding:12px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
 #ctl button{width:52px;height:52px;background:#3b4a54}#ctl .off{background:#8a2a2a}#ctl #hang{background:#d33}
+.m img{display:block;max-width:100%;max-height:300px;min-height:40px;border-radius:6px;margin-bottom:4px;cursor:pointer}
+.m video{display:block;max-width:100%;max-height:320px;border-radius:6px;margin-bottom:4px;background:#000}
+.m audio{display:block;width:240px;max-width:100%;margin-bottom:4px}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:10;display:flex;flex-direction:column}
+#lb .top{display:flex;gap:14px;align-items:center;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));color:#fff}
+#lb .top span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lb .top a,#lb .top b{color:#fff;font-size:14px;cursor:pointer;text-decoration:none}#lb .top b{font-size:26px;line-height:1}
+#lb .box{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 8px 8px;color:#fff}
+#lb img{max-width:100%;max-height:100%;object-fit:contain}
+#lb iframe{width:100%;height:100%;border:0;background:#fff;border-radius:6px}
 .hide{display:none!important}
 </style></head><body>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
@@ -59,6 +69,7 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:#00a884;colo
 </div>
 <header class="hide" id="head"><input id="room" placeholder="Salon" maxlength="48"><button class="hbtn" id="rb" aria-label="Tous les salons">🗂</button><button class="hbtn" id="vc" aria-label="Appel vidéo">📹</button><small id="st">…</small><a id="out">Quitter</a></header>
 <div id="rooms" class="hide"><div class="top"><b>Tous les salons</b><a id="rx" aria-label="Fermer">×</a></div><div id="rl"></div></div>
+<div id="lb" class="hide"><div class="top"><span id="lbn"></span><a id="lbo">Ouvrir</a><a id="lbd">Télécharger</a><b id="lbx" aria-label="Fermer">×</b></div><div class="box" id="lbb"></div></div>
 <div id="callbar" class="hide"><span id="cbt"></span><button id="cbj">Rejoindre</button></div>
 <div id="call" class="hide"><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
 <div id="list" class="hide"></div>
@@ -102,9 +113,41 @@ $('ok').onclick=async()=>{
 $('pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('ok').click()});
 $('out').onclick=()=>sb.auth.signOut();
 
+/* ---------- Fichiers : liens signés, aperçu, téléchargement ---------- */
+const urlCache=new Map();
+function signed(path){
+  let e=urlCache.get(path);
+  if(!e||e.exp<Date.now()){
+    e={url:null,exp:Date.now()+50*60*1000};
+    e.p=sb.storage.from('files').createSignedUrl(path,3600).then(({data,error})=>{if(error)throw error;e.url=data.signedUrl;return e.url});
+    e.p.catch(()=>urlCache.delete(path));urlCache.set(path,e);
+  }
+  return e;
+}
+async function dl(f){const {data,error}=await sb.storage.from('files').createSignedUrl(f.path,60,{download:f.name});if(error)alert('Fichier indisponible');else location.href=data.signedUrl}
+let lbBlob=null;
+async function view(f){
+  const b=$('lbb');b.textContent='Chargement…';$('lbn').textContent=f.name;$('lb').classList.remove('hide');
+  $('lbd').onclick=()=>dl(f);
+  try{
+    if(f.type==='application/pdf'){
+      const {data,error}=await sb.storage.from('files').download(f.path);if(error)throw error;
+      lbBlob=URL.createObjectURL(new Blob([data],{type:'application/pdf'}));
+      const i=document.createElement('iframe');i.src=lbBlob;b.textContent='';b.append(i);
+      $('lbo').onclick=()=>window.open(lbBlob,'_blank');
+    }else{
+      const u=await signed(f.path).p;const i=document.createElement('img');i.src=u;b.textContent='';b.append(i);
+      $('lbo').onclick=()=>window.open(u,'_blank');
+    }
+  }catch(e){b.textContent='Aperçu impossible. Utilisez « Télécharger ».'}
+}
+function closeLb(){$('lb').classList.add('hide');$('lbb').textContent='';if(lbBlob){URL.revokeObjectURL(lbBlob);lbBlob=null}}
+$('lbx').onclick=closeLb;$('lbb').onclick=e=>{if(e.target.id==='lbb')closeLb()};
+addEventListener('keydown',e=>{if(e.key==='Escape')closeLb()});
+
 /* ---------- Messages ---------- */
 function render(){
-  const l=$('list'),near=l.scrollHeight-l.scrollTop-l.clientHeight<120;l.textContent='';
+  const l=$('list'),near=l.scrollHeight-l.scrollTop-l.clientHeight<120,stick=near||first;l.textContent='';
   if(!msgs.length){const e=document.createElement('div');e.className='empty';e.textContent='Aucun message. Écrivez le premier !';l.append(e);return}
   let ld='';
   for(const m of msgs){
@@ -112,10 +155,16 @@ function render(){
     if(dl!==ld){const d=document.createElement('div');d.className='day';d.textContent=dl;l.append(d);ld=dl}
     const el=document.createElement('div'),mine=m.uid===me;el.className='m'+(mine?' me':'');
     if(!mine){const n=document.createElement('span');n.className='n';n.textContent=m.name;el.append(n)}
-    if(m.file){const f=m.file,a=document.createElement('a');a.className='file';a.textContent='📄 '+f.name+' ';
-      const s=document.createElement('small');s.textContent=Math.max(1,Math.round(f.size/1024))+' Ko';a.append(s);
-      a.onclick=async()=>{const {data,error}=await sb.storage.from('files').createSignedUrl(f.path,60,{download:f.name});if(error)alert('Fichier indisponible');else location.href=data.signedUrl};
-      el.append(a)}
+    if(m.file){const f=m.file,ty=f.type||'',pdf=ty==='application/pdf';
+      const ok=(e,ev,mk)=>{if(e.url)mk(e.url);else e.p.then(mk).catch(()=>{})};
+      if(/^image\/(png|jpeg|gif|webp)$/.test(ty)){const im=document.createElement('img');im.loading='lazy';im.alt=f.name;
+        im.onload=()=>{if(stick)l.scrollTop=l.scrollHeight};im.onclick=()=>view(f);ok(signed(f.path),0,u=>im.src=u);el.append(im)}
+      else if(/^(video\/(mp4|webm|ogg|quicktime)|audio\/(mpeg|ogg|wav|webm|mp4))$/.test(ty)){
+        const v=document.createElement(ty.startsWith('video')?'video':'audio');v.controls=true;v.preload='metadata';v.playsInline=true;
+        v.onloadedmetadata=()=>{if(stick)l.scrollTop=l.scrollHeight};ok(signed(f.path),0,u=>v.src=u);el.append(v)}
+      else{const a=document.createElement('a');a.className='file';a.textContent=(pdf?'📕 ':'📄 ')+f.name+' ';
+        const s=document.createElement('small');s.textContent=Math.max(1,Math.round(f.size/1024))+' Ko'+(pdf?' · Aperçu':'');a.append(s);
+        a.onclick=()=>pdf?view(f):dl(f);el.append(a)}}
     if(m.text)el.append(document.createTextNode(m.text));
     const t=document.createElement('span');t.className='t';t.textContent=hm(ts);el.append(t);l.append(el);
   }
@@ -219,35 +268,4 @@ async function makePC(id,name,init){
 }
 /* Règle anti-collision : seul l'identifiant le plus grand envoie l'offre */
 function ensurePeer(k){if(inCall&&!pcs[k]&&me>k)makePC(k,pname(k),true)}
-async function flush(id){for(const c of pend[id]||[])try{await pcs[id].addIceCandidate(c)}catch(_){}pend[id]=[]}
-async function onSig(p){
-  if(!inCall||p.to!==me)return;const id=p.from,d=p.data;
-  if(d.type==='offer'){
-    const pc=pcs[id]||await makePC(id,p.name,false);
-    await pc.setRemoteDescription(d.sdp);await flush(id);
-    await pc.setLocalDescription(await pc.createAnswer());sig(id,{type:'answer',sdp:pc.localDescription});
-  }else if(d.type==='answer'&&pcs[id]){await pcs[id].setRemoteDescription(d.sdp);await flush(id)}
-  else if(d.type==='cand'&&pcs[id]){if(pcs[id].remoteDescription)try{await pcs[id].addIceCandidate(d.c)}catch(_){}else pend[id].push(d.c)}
-}
-async function joinCall(){
-  if(inCall||!cch)return;
-  if(!navigator.mediaDevices||!window.RTCPeerConnection){alert('Appel vidéo indisponible : le site doit être en HTTPS.');return}
-  const o=others();if(o.length>=5){alert('Appel complet (6 personnes maximum).');return}
-  try{stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true})}
-  catch(_){try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){alert('Accès au micro/à la caméra refusé.');return}}
-  inCall=true;$('callbar').classList.add('hide');$('call').classList.remove('hide');tile('me',stream,true,'Moi');
-  $('cam').classList.toggle('off',!stream.getVideoTracks().length);$('mic').classList.remove('off');
-  if(!o.length)sb.from('messages').insert({room:rm,text:'📞 a lancé un appel vidéo'}).then(poll);
-  await cch.track({name:myName});o.forEach(ensurePeer);
-}
-function hang(){
-  if(!inCall)return;inCall=false;
-  if(cch)cch.untrack();Object.keys(pcs).forEach(drop);
-  if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
-  $('grid').textContent='';$('call').classList.add('hide');banner();
-}
-function toggle(kind,btn){const ts=kind==='audio'?stream.getAudioTracks():stream.getVideoTracks();if(!ts.length)return;const on=!ts[0].enabled;ts.forEach(t=>t.enabled=on);btn.classList.toggle('off',!on)}
-$('vc').onclick=joinCall;$('cbj').onclick=joinCall;$('hang').onclick=hang;
-$('mic').onclick=e=>toggle('audio',e.currentTarget);$('cam').onclick=e=>toggle('video',e.currentTarget);
-}
-</script></body></html>
+async function
