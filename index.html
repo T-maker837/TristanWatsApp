@@ -3,8 +3,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Messagerie</title>
 <style>
-:root{--bg:#efeae2;--head:#5262f5;--mine:#d9fdd3;--other:#fff;--text:#111b21;--sub:#667781;--bar:#f0f2f5;--chip:#e1f3fb}
-@media (prefers-color-scheme:dark){:root{--bg:#0b141a;--head:#202c33;--mine:#ff6f1c;--other:#202c33;--text:#e9edef;--sub:#8696a0;--bar:#202c33;--chip:#182229}}
+:root{--bg:#efeae2;--head:#008069;--mine:#d9fdd3;--other:#fff;--text:#111b21;--sub:#667781;--bar:#f0f2f5;--chip:#e1f3fb}
+@media (prefers-color-scheme:dark){:root{--bg:#0b141a;--head:#202c33;--mine:#005c4b;--other:#202c33;--text:#e9edef;--sub:#8696a0;--bar:#202c33;--chip:#182229}}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--text);font:15px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;max-width:760px;margin:0 auto}
 header{background:var(--head);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px}
@@ -76,11 +76,62 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:#00a884;colo
 #rep .row button{width:auto;height:auto;border-radius:16px;padding:8px 16px;font-size:14px}
 @media (max-width:480px){#st{display:none}}
 .hide{display:none!important}
+
+/* ===== Design v2 ===== */
+:root{--p:#00a884;--bg:#efe7dd;--surface:#fff;--head:#fff;--htext:#111b21;--other:#fff;--mine:#d9fdd3;--text:#111b21;--sub:#667781;--bar:#f0f2f5;--chip:#e7f3ef;--line:rgba(120,120,120,.18);--shadow:0 1px 2px rgba(11,20,26,.13)}
+@media (prefers-color-scheme:dark){:root{--bg:#0b141a;--surface:#1f2c34;--head:#1f2c34;--htext:#e9edef;--other:#1f2c34;--mine:#005c4b;--text:#e9edef;--sub:#8696a0;--bar:#2a3942;--chip:#16262d;--line:rgba(255,255,255,.08);--shadow:0 1px 2px rgba(0,0,0,.4)}}
+body{max-width:820px;box-shadow:0 0 0 1px var(--line)}
+body.out{background:linear-gradient(165deg,#00a884 0,#075e54 42%,var(--bg) 42%);box-shadow:none}
+button{transition:transform .1s,background .15s,opacity .15s}button:active{transform:scale(.94)}
+header{background:var(--head);color:var(--htext);padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));gap:2px;border-bottom:1px solid var(--line)}
+.ibtn{background:transparent;color:var(--sub);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;padding:0}
+.ibtn:hover{background:var(--line)}
+.who{flex:1;min-width:0;display:flex;align-items:center;gap:10px;cursor:pointer;padding:2px 6px}
+.wt{min-width:0}.wt b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header small{color:var(--sub);opacity:1;font-size:12.5px}
+header #st{display:block}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;flex:none;background:var(--p);font-size:15px;user-select:none}
+.av.sm{width:30px;height:30px;font-size:12px}
+#list{padding:10px 12px;gap:0;background-image:radial-gradient(var(--line) 1px,transparent 1.3px);background-size:22px 22px}
+.row{display:flex;align-items:flex-end;gap:6px;margin-top:10px}.row.cont{margin-top:2px}.row.me{justify-content:flex-end}
+.row.new .m{animation:pop .2s ease-out}@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.m{max-width:min(78%,520px);padding:7px 10px 5px;border-radius:14px;box-shadow:var(--shadow);line-height:1.38}
+.row.me .m{background:var(--mine);border-top-right-radius:4px}.row.other .m{border-top-left-radius:4px}.row.cont .m{border-radius:14px}
+.m .n{font-size:12.5px;margin-bottom:1px}.m .t{opacity:.7}
+.day{background:var(--surface);box-shadow:var(--shadow);margin:14px auto 6px;position:sticky;top:4px;z-index:1;border-radius:12px;padding:5px 12px;text-transform:capitalize}
+.empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px;line-height:1.5}
+.empty .ei{width:64px;height:64px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--p);margin-bottom:6px}
+.bar{background:transparent;padding:8px 10px;padding-bottom:max(8px,env(safe-area-inset-bottom));gap:6px;align-items:flex-end}
+.comp{flex:1;display:flex;align-items:flex-end;background:var(--surface);border-radius:24px;box-shadow:var(--shadow);padding:2px 4px}
+.comp textarea{flex:1;background:transparent;border-radius:0;padding:11px 6px;color:var(--text)}
+.send{width:46px;height:46px;background:var(--p);color:#fff;display:grid;place-items:center;padding:0;box-shadow:var(--shadow)}
+#home{position:fixed;inset:0;margin:0 auto;max-width:820px;background:var(--head);z-index:8;display:flex;flex-direction:column;animation:slide .2s ease-out}
+@keyframes slide{from{transform:translateX(-24px);opacity:0}}
+#home .top,#adm .top{background:var(--head);color:var(--htext);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top))}
+#home .top b,#adm .top b{flex:1;font-size:18px;padding-left:6px}#adm .top a{color:inherit}
+.tabs{background:var(--head)}.tabs button{color:var(--sub)}.tabs .on{color:var(--p);border-bottom-color:var(--p)}
+.srch{display:flex;gap:8px;padding:10px 12px}
+.srch input{flex:1;background:var(--bar);border-radius:12px;padding:10px 14px;color:var(--text)}
+.pill{width:auto;height:auto;border-radius:12px;padding:0 16px;font-size:14px;background:var(--p)}
+#hl{overflow-y:auto;flex:1}
+.item{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--line)}.item:hover{background:var(--bar)}
+.item .i{flex:1;min-width:0}.item .i b{display:block}
+.item .i small{display:block;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .r{font-size:12px;color:var(--sub);text-align:right;flex:none}
+.avw{position:relative;flex:none}.avw .dot{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:#25d366;border:2px solid var(--head)}
+#auth{background:var(--surface);color:var(--text);border-radius:22px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:28px 24px;width:min(380px,92%)}
+#auth h2{margin:0}#auth p{margin:0;color:var(--sub);font-size:14px}
+.logo{width:68px;height:68px;border-radius:22px;background:linear-gradient(135deg,#25d366,#00a884);display:grid;place-items:center;margin:0 auto;color:#fff}
+#auth input{background:var(--bar);border-radius:12px;padding:13px 14px;color:var(--text)}
+#auth button{background:var(--p);border-radius:12px;padding:13px;font-weight:600}
+#callbar{background:var(--p);color:#fff}#callbar button{background:#fff;color:var(--p);font-weight:600}
+#ctl button{display:grid;place-items:center;padding:0}
+::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
 </style></head><body>
 <div id="fatal" class="hide" style="margin:auto;padding:24px;max-width:90%;text-align:center"><h2>Le site ne peut pas démarrer</h2><p id="fmsg"></p></div>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
 <div id="auth" class="hide">
-  <div style="font-size:48px">💬</div><h2 style="margin:0">Messagerie</h2>
+  <div class="logo" id="logo"></div><h2>Messagerie</h2><p>Discutez avec tous vos contacts, en direct.</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
@@ -88,8 +139,14 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:#00a884;colo
   <button id="ok">Se connecter</button>
   <a id="sw">Pas de compte ? Créer un compte</a>
 </div>
-<header class="hide" id="head"><input id="room" placeholder="Salon" maxlength="48"><button class="hbtn" id="rb" aria-label="Tous les salons">🗃️</button><button class="hbtn" id="vc" aria-label="Appel vidéo">📹</button><button class="hbtn hide" id="ad" aria-label="Administration">🛡</button><button class="hbtn" id="rp" aria-label="Signaler un problème">🚩</button><small id="st">…</small><a id="out">Quitter</a></header>
-<div id="rooms" class="hide"><div class="top"><b>Tous les salons</b><a id="rx" aria-label="Fermer">×</a></div><div id="rl"></div></div>
+<header class="hide" id="head">
+  <button class="ibtn" id="rb" aria-label="Conversations"></button>
+  <div class="who" id="who"><div class="av" id="hav"></div><div class="wt"><b id="title">general</b><small id="st">…</small></div></div>
+  <button class="ibtn" id="vc" aria-label="Appel vidéo"></button><button class="ibtn" id="rp" aria-label="Signaler un problème"></button><button class="ibtn hide" id="ad" aria-label="Administration"></button><button class="ibtn" id="out" aria-label="Se déconnecter"></button>
+</header>
+<div id="home" class="hide"><div class="top"><button class="ibtn" id="hx" aria-label="Fermer"></button><b>Conversations</b></div>
+<div class="tabs"><button id="hs" class="on">Salons</button><button id="hc">Contacts</button></div>
+<div class="srch"><input id="hq" placeholder="Rechercher ou créer un salon"><button class="pill" id="hgo">Rejoindre</button></div><div id="hl"></div></div>
 <div id="lb" class="hide"><div class="top"><span id="lbn"></span><a id="lbo">Ouvrir</a><a id="lbd">Télécharger</a><b id="lbx" aria-label="Fermer">×</b></div><div class="box" id="lbb"></div></div>
 <div id="adm" class="hide"><div class="top"><b>Administration</b><a id="ax" aria-label="Fermer">×</a></div>
 <div class="tabs"><button id="tu" class="on">Utilisateurs</button><button id="tr">Signalements</button></div>
@@ -101,11 +158,11 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:#00a884;colo
 <div id="callbar" class="hide"><span id="cbt"></span><button id="cbj">Rejoindre</button></div>
 <div id="call" class="hide"><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
 <div id="list" class="hide"></div>
-<div class="bar hide" id="bar"><input type="file" id="file" class="hide"><button class="clip" id="clip" aria-label="Joindre">📎</button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea><button id="go" aria-label="Envoyer">➤</button></div>
+<div class="bar hide" id="bar"><input type="file" id="file" class="hide"><div class="comp"><button class="ibtn" id="clip" aria-label="Joindre un fichier"></button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea></div><button class="send" id="go" aria-label="Envoyer"></button></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-const SUPABASE_URL='https://qnvcwkhooozsebrwzclj.supabase.co';
-const SUPABASE_KEY='sb_publishable_rTLFlgvuCXetFJ0rmR9nUA_vGrlU7ZB';
+const SUPABASE_URL='COLLEZ_ICI_VOTRE_URL';
+const SUPABASE_KEY='COLLEZ_ICI_VOTRE_CLE_ANON';
 
 const $=i=>document.getElementById(i);
 function fatal(msg){['auth','head','list','bar'].forEach(i=>$(i).classList.add('hide'));$('fmsg').textContent=msg;$('fatal').classList.remove('hide')}
@@ -118,18 +175,33 @@ function main(){
 let url=SUPABASE_URL.trim();if(!/^https?:\/\//.test(url))url='https://'+url;
 try{url=new URL(url).origin}catch(_){fatal('SUPABASE_URL est invalide : elle doit ressembler à https://xxxxxxxx.supabase.co');return}
 const sb=supabase.createClient(url,SUPABASE_KEY.trim());
-let isAdmin=false,statT=null,me=null,myName='',msgs=[],seen=new Set(),last=0,rm='general',first=true,reg=false,pollT=null,rtCh=null;
+let dm=false,peer=null,shown=0,onCh=null,onlineSet=new Set(),hTab='rooms',hRooms=[],hContacts=null,isAdmin=false,statT=null,me=null,myName='',msgs=[],seen=new Set(),last=0,rm='general',first=true,reg=false,pollT=null,rtCh=null;
 const hm=t=>new Date(t).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 const dayLabel=t=>{const d=new Date(t),n=new Date(),k=x=>x.toDateString();if(k(d)===k(n))return "Aujourd'hui";if(k(d)===k(new Date(n-864e5)))return 'Hier';return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})};
 const slug=v=>(v.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'-').slice(0,48)||'general');
 
+/* ---------- Icônes, avatars ---------- */
+const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'};
+const ico=(n,f,s)=>'<svg viewBox="0 0 24 24" width="'+(s||22)+'" height="'+(s||22)+'" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+P[n]+'</svg>';
+[['rb','chat'],['vc','video'],['rp','flag'],['ad','shield'],['out','logout'],['clip','clip'],['go','send',1],['hx','close'],['ax','close'],['mic','mic'],['cam','video'],['hang','hang'],['logo','chat',1,34]].forEach(([i,n,f,s])=>{const e=$(i);if(e)e.innerHTML=ico(n,f,s)});
+const hue=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.codePointAt(0))%360;return h};
+const initials=n=>(String(n).replace(/^[^\p{L}\p{N}]+/u,'').slice(0,2)||'?').toUpperCase();
+function paintAv(e,name){e.textContent=initials(name);e.style.background='hsl('+hue(name)+' 50% 42%)'}
+function idle(){$('st').textContent=dm?(onlineSet.has(peer)?'en ligne':'hors ligne'):'Salon'}
+function goOnline(){
+  if(onCh)sb.removeChannel(onCh);
+  onCh=sb.channel('online',{config:{presence:{key:me}}});
+  onCh.on('presence',{event:'sync'},()=>{onlineSet=new Set(Object.keys(onCh.presenceState()));idle();if(!$('home').classList.contains('hide'))homeRender()})
+      .subscribe(s=>{if(s==='SUBSCRIBED')onCh.track({name:myName})});
+}
+
 /* ---------- Connexion ---------- */
 showChat(false);
-function showChat(on){['head','list','bar'].forEach(i=>$(i).classList.toggle('hide',!on));$('auth').classList.toggle('hide',on)}
+function showChat(on){document.body.classList.toggle('out',!on);['head','list','bar'].forEach(i=>$(i).classList.toggle('hide',!on));$('auth').classList.toggle('hide',on)}
 async function start(session){
   if(me)return;me=session.user.id;myName=(session.user.user_metadata||{}).name||'Anonyme';
   if(!(await loadStatus()))return;
-  showChat(true);$('room').value=localStorage.getItem('rm')||'general';openRoom();
+  showChat(true);goOnline();const sr=localStorage.getItem('rm')||'general';openRoom(sr,localStorage.getItem('rml')||sr,localStorage.getItem('rmp')||null);
   clearInterval(pollT);pollT=setInterval(poll,4000);clearInterval(statT);statT=setInterval(loadStatus,60000);
 }
 async function loadStatus(){
@@ -137,7 +209,7 @@ async function loadStatus(){
   if(data[0].is_blk){alert('Votre compte a été bloqué par un administrateur.');sb.auth.signOut();return false}
   isAdmin=!!data[0].is_adm;$('ad').classList.toggle('hide',!isAdmin);return true;
 }
-function stopAll(){me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
+function stopAll(){if(onCh){sb.removeChannel(onCh);onCh=null}onlineSet=new Set();$('home').classList.add('hide');me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
 sb.auth.onAuthStateChange((ev,s)=>{if(s&&!me)start(s);else if(!s&&me)stopAll()});
 sb.auth.getSession().then(({data})=>{if(data.session)start(data.session);else showChat(false)});
 $('sw').onclick=()=>{reg=!reg;$('pseudo').classList.toggle('hide',!reg);$('ok').textContent=reg?'Créer le compte':'Se connecter';$('sw').textContent=reg?'Déjà un compte ? Se connecter':'Pas de compte ? Créer un compte'};
@@ -189,15 +261,18 @@ addEventListener('keydown',e=>{if(e.key==='Escape')closeLb()});
 /* ---------- Messages ---------- */
 function render(){
   const l=$('list'),near=l.scrollHeight-l.scrollTop-l.clientHeight<120,stick=near||first;l.textContent='';
-  if(!msgs.length){const e=document.createElement('div');e.className='empty';e.textContent='Aucun message. Écrivez le premier !';l.append(e);return}
-  let ld='';
+  if(!msgs.length){const e=mk('div','empty');const i=mk('div','ei');i.innerHTML=ico('msg',0,30);e.append(i,mk('b','','Aucun message'),mk('small','','Écrivez le premier !'));l.append(e);return}
+  const animate=!first;let ld='',prev=null,pts=0;
   for(const m of msgs){
     const ts=new Date(m.created_at).getTime(),dl=dayLabel(ts);
-    if(dl!==ld){const d=document.createElement('div');d.className='day';d.textContent=dl;l.append(d);ld=dl}
-    const el=document.createElement('div'),mine=m.uid===me;el.className='m'+(mine?' me':'');
-    if(!mine){const n=document.createElement('span');n.className='n';n.textContent=m.name;el.append(n)}
+    if(dl!==ld){l.append(mk('div','day',dl));ld=dl;prev=null}
+    const mine=m.uid===me,cont=!!prev&&prev.uid===m.uid&&ts-pts<5*60e3;
+    const row=mk('div','row '+(mine?'me':'other')+(cont?' cont':'')+(animate&&m.id>shown?' new':''));
+    if(!mine&&!dm){const a=mk('div','av sm');if(cont)a.style.visibility='hidden';else paintAv(a,m.name);row.append(a)}
+    const el=mk('div','m');
+    if(!mine&&!dm&&!cont){const n=mk('span','n',m.name);n.style.color='hsl('+hue(m.name)+' 55% 48%)';el.append(n)}
     if(m.file){const f=m.file,ty=f.type||'',pdf=ty==='application/pdf';
-      const ok=(e,ev,mk)=>{if(e.url)mk(e.url);else e.p.then(mk).catch(()=>{})};
+      const ok=(e,ev,mkf)=>{if(e.url)mkf(e.url);else e.p.then(mkf).catch(()=>{})};
       if(/^image\/(png|jpeg|gif|webp)$/.test(ty)){const im=document.createElement('img');im.loading='lazy';im.alt=f.name;
         im.onload=()=>{if(stick)l.scrollTop=l.scrollHeight};im.onclick=()=>view(f);ok(signed(f.path),0,u=>im.src=u);el.append(im)}
       else if(/^(video\/(mp4|webm|ogg|quicktime)|audio\/(mpeg|ogg|wav|webm|mp4))$/.test(ty)){
@@ -207,9 +282,10 @@ function render(){
         const s=document.createElement('small');s.textContent=Math.max(1,Math.round(f.size/1024))+' Ko'+(pdf?' · Aperçu':'');a.append(s);
         a.onclick=()=>pdf?view(f):dl(f);el.append(a)}}
     if(m.text)el.append(document.createTextNode(m.text));
-    const t=document.createElement('span');t.className='t';t.textContent=hm(ts);el.append(t);l.append(el);
+    el.append(mk('span','t',hm(ts)));row.append(el);l.append(row);prev=m;pts=ts;
   }
-  if(near||first){l.scrollTop=l.scrollHeight;first=false}
+  shown=msgs[msgs.length-1].id;
+  if(stick){l.scrollTop=l.scrollHeight;first=false}
 }
 function addMsgs(rows,r){
   if(r!==rm)return;let ch=false;
@@ -220,20 +296,22 @@ async function poll(){
   const r=rm;
   const {data,error}=await sb.from('messages').select('*').eq('room',r).gt('id',last).order('id');
   if(error){$('st').textContent='Hors ligne';return}
-  $('st').textContent='En ligne';addMsgs(data,r);
+  idle();addMsgs(data,r);
 }
-function openRoom(){
+function openRoom(id,label,pr){
   if(inCall)hang();
-  rm=slug($('room').value);$('room').value=rm;localStorage.setItem('rm',rm);
-  msgs=[];seen.clear();last=0;first=true;render();
+  rm=id||'general';dm=rm.startsWith('dm-');peer=dm?(pr||null):null;
+  const nm=dm?(label||'Contact'):rm;$('title').textContent=dm?nm:'# '+nm;paintAv($('hav'),nm);
+  localStorage.setItem('rm',rm);localStorage.setItem('rml',nm);localStorage.setItem('rmp',peer||'');
+  idle();msgs=[];seen.clear();last=0;shown=0;first=true;render();
   const r=rm;
   sb.from('messages').select('*').eq('room',r).order('id',{ascending:false}).limit(200).then(({data,error})=>{
-    if(error){$('st').textContent='Hors ligne';return}$('st').textContent='En ligne';addMsgs(data,r);render()});
+    if(error){$('st').textContent='Hors ligne';return}idle();addMsgs(data,r);render()});
   if(rtCh)sb.removeChannel(rtCh);
   rtCh=sb.channel('msgs-'+r).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room=eq.'+r},p=>addMsgs([p.new],r)).subscribe();
   watchCall();
 }
-$('room').addEventListener('change',openRoom);
+
 async function send(){
   const text=$('in').value.trim();if(!text)return;$('in').value='';$('in').style.height='auto';
   const {error}=await sb.from('messages').insert({room:rm,text});
@@ -253,92 +331,43 @@ $('file').onchange=async e=>{
     const path=me+'/'+Date.now()+'-'+f.name.replace(/[^\w.\-]+/g,'_').slice(-80);
     let r=await sb.storage.from('files').upload(path,f,{contentType:f.type||'application/octet-stream'});if(r.error)throw r.error;
     r=await sb.from('messages').insert({room:rm,text:cap,file:{path,name:f.name,size:f.size,type:f.type}});if(r.error)throw r.error;
-    $('in').value='';$('st').textContent='En ligne';poll();
+    $('in').value='';idle();poll();
   }catch(err){$('st').textContent='Échec : '+(err.message||'envoi')}
 };
 
-/* ---------- Liste des salons ---------- */
-$('rb').onclick=async()=>{
-  $('rooms').classList.remove('hide');const l=$('rl');l.textContent='Chargement…';l.style.padding='16px';
-  const {data,error}=await sb.rpc('list_rooms',{cur:rm});
-  if(error){l.textContent='Impossible de charger la liste.';return}
-  l.textContent='';l.style.padding='0';
-  const rows=data.slice();if(!rows.some(x=>x.rname==='general'))rows.push({rname:'general',nb:0,ts_last:null,last_text:''});
-  for(const x of rows){
-    const d=document.createElement('div');d.className='rr';
-    const a=document.createElement('div');a.className='a';a.textContent=x.rname.replace(/^_/,'').slice(0,2).toUpperCase();
-    const i=document.createElement('div');i.className='i';const b=document.createElement('b');b.textContent=x.rname+(x.rname===rm?' (actuel)':'');
-    const sm=document.createElement('small');sm.textContent=(x.last_text||'Aucun message').slice(0,80);i.append(b,sm);
-    const t=document.createElement('div');t.className='r';t.textContent=(x.ts_last?hm(x.ts_last)+' · ':'')+x.nb+' msg';
-    d.append(a,i,t);d.onclick=()=>{$('room').value=x.rname;openRoom();$('rooms').classList.add('hide')};l.append(d);
-  }
-};
-$('rx').onclick=()=>$('rooms').classList.add('hide');
-
-/* ---------- Signaler un problème ---------- */
-$('rp').onclick=()=>{$('rpa').value='';$('rpt').value='';$('rps').textContent='';$('rep').classList.remove('hide')};
-$('rpc').onclick=()=>$('rep').classList.add('hide');
-$('rpsend').onclick=async()=>{
-  const text=$('rpt').value.trim();if(!text){$('rps').textContent='Décrivez le problème.';return}
-  const {error}=await sb.from('reports').insert({text,about:$('rpa').value.trim()});
-  if(error){$('rps').textContent='Envoi impossible : '+error.message;return}
-  $('rps').textContent='Merci, votre signalement a été envoyé.';setTimeout(()=>$('rep').classList.add('hide'),1500);
-};
-
-/* ---------- Administration ---------- */
-let admTab='users',admUsers=[],admReports=[];
-function mk(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
-function btn(label,fn,danger){const b=mk('button',danger?'danger':'',label);b.onclick=fn;return b}
-async function admLoad(){
-  const al=$('al');al.textContent='Chargement…';al.style.padding='16px';
-  const u=await sb.rpc('admin_list_users');if(u.error){al.textContent='Erreur : '+u.error.message;return}admUsers=u.data;
-  const r=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(200);if(r.error){al.textContent='Erreur : '+r.error.message;return}admReports=r.data;
-  admRender();
+/* ---------- Conversations : salons et contacts ---------- */
+function item(name,title,sub,right,fn,online){
+  const d=mk('div','item'),w=mk('div','avw'),a=mk('div','av');paintAv(a,name);w.append(a);if(online)w.append(mk('span','dot'));
+  const i=mk('div','i');i.append(mk('b','',title),mk('small','',sub));d.append(w,i);if(right)d.append(mk('div','r',right));d.onclick=fn;return d;
 }
-function admRender(){
-  const al=$('al');al.textContent='';al.style.padding='0';
-  const open=admReports.filter(x=>!x.resolved).length;$('tr').textContent='Signalements'+(open?' ('+open+')':'');
-  $('tu').classList.toggle('on',admTab==='users');$('tr').classList.toggle('on',admTab==='reports');
-  $('as').classList.toggle('hide',admTab!=='users');
-  if(admTab==='users'){
-    const q=$('as').value.trim().toLowerCase();
-    const rows=admUsers.filter(x=>!q||(x.name||'').toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q));
-    if(!rows.length)al.append(mk('div','empty','Aucun utilisateur'));
-    for(const x of rows){
-      const d=mk('div','ar'),h=mk('b','',x.name);
-      if(x.adm)h.append(mk('span','bdg','Admin'));if(x.blocked)h.append(mk('span','bdg red','Bloqué'));
-      d.append(h,mk('small','',(x.email||'')+' · '+x.nb+' msg · inscrit le '+new Date(x.created_at).toLocaleDateString('fr-FR')));
-      if(!x.adm&&x.uid!==me){
-        const b=mk('div','b');
-        b.append(btn(x.blocked?'Débloquer':'Bloquer',async()=>{
-          if(!x.blocked&&!confirm('Bloquer '+x.name+' ? Il ne pourra plus lire ni écrire.'))return;
-          const r=await sb.rpc('admin_set_blocked',{p_target:x.uid,p_block:!x.blocked});if(r.error)alert(r.error.message);else admLoad()}));
-        b.append(btn('Supprimer',async()=>{
-          if(!confirm('Supprimer définitivement le compte de '+x.name+' ?'))return;
-          const purge=confirm('Supprimer aussi ses '+x.nb+' message(s) ?\nOK = oui, Annuler = conserver les messages.');
-          const r=await sb.rpc('admin_delete_user',{p_target:x.uid,p_purge:purge});if(r.error)alert(r.error.message);else admLoad()},true));
-        d.append(b);
-      }
-      al.append(d);
-    }
+const closeHome=()=>$('home').classList.add('hide');
+const joinRoom=s=>{openRoom(s,s);closeHome()};
+async function homeLoad(){
+  $('hl').textContent='Chargement…';$('hl').style.padding='16px';
+  const [r,k]=await Promise.all([sb.rpc('list_rooms',{cur:rm}),sb.rpc('list_contacts')]);
+  hRooms=r.error?[]:r.data;hContacts=k.error?null:k.data;$('hl').style.padding='0';homeRender();
+}
+function homeRender(){
+  const l=$('hl'),q=$('hq').value.trim().toLowerCase();l.textContent='';
+  $('hs').classList.toggle('on',hTab==='rooms');$('hc').classList.toggle('on',hTab==='contacts');$('hgo').classList.toggle('hide',hTab!=='rooms');
+  $('hq').placeholder=hTab==='rooms'?'Rechercher ou créer un salon':'Rechercher un contact';
+  if(hTab==='rooms'){
+    const s=slug(q),rows=hRooms.slice();if(!rows.some(x=>x.rname==='general'))rows.push({rname:'general',nb:0,ts_last:null,last_text:''});
+    if(q&&!rows.some(x=>x.rname===s))l.append(item(s,'Créer le salon « '+s+' »','Appuyez pour le créer et le rejoindre','',()=>joinRoom(s)));
+    rows.filter(x=>!q||x.rname.includes(q)).forEach(x=>l.append(item(x.rname,'# '+x.rname+(x.rname===rm?' (actuel)':''),(x.last_text||'Aucun message').slice(0,80),(x.ts_last?hm(x.ts_last)+' · ':'')+x.nb,()=>joinRoom(x.rname))));
   }else{
-    if(!admReports.length)al.append(mk('div','empty','Aucun signalement'));
-    for(const x of admReports){
-      const d=mk('div','ar'+(x.resolved?' done':'')),h=mk('b','',x.name);
-      if(x.resolved)h.append(mk('span','bdg','Résolu'));
-      d.append(h,mk('small','',new Date(x.created_at).toLocaleString('fr-FR')+(x.about?' · concerne : '+x.about:'')),mk('p','',x.text));
-      const b=mk('div','b');
-      if(x.about)b.append(btn('Voir l’utilisateur',()=>{admTab='users';$('as').value=x.about;admRender()}));
-      b.append(btn(x.resolved?'Rouvrir':'Marquer résolu',async()=>{const r=await sb.from('reports').update({resolved:!x.resolved}).eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()}));
-      b.append(btn('Supprimer',async()=>{if(!confirm('Supprimer ce signalement ?'))return;const r=await sb.from('reports').delete().eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()},true));
-      d.append(b);al.append(d);
-    }
+    if(hContacts===null){l.append(mk('div','empty','Contacts indisponibles : exécutez contacts.sql dans Supabase.'));return}
+    const rows=hContacts.filter(x=>!q||x.name.toLowerCase().includes(q)).sort((a,b)=>(onlineSet.has(b.uid)-onlineSet.has(a.uid))||a.name.localeCompare(b.name));
+    if(!rows.length)l.append(mk('div','empty','Aucun contact'));
+    rows.forEach(x=>l.append(item(x.name,x.name,onlineSet.has(x.uid)?'en ligne':'hors ligne','',()=>{openRoom('dm-'+[me,x.uid].sort().join('-'),x.name,x.uid);closeHome()},onlineSet.has(x.uid))));
   }
 }
-$('ad').onclick=()=>{$('adm').classList.remove('hide');admTab='users';$('as').value='';admLoad()};
-$('ax').onclick=()=>$('adm').classList.add('hide');
-$('tu').onclick=()=>{admTab='users';admRender()};$('tr').onclick=()=>{admTab='reports';admRender()};
-$('as').addEventListener('input',admRender);
+$('rb').onclick=$('who').onclick=()=>{$('home').classList.remove('hide');hTab='rooms';$('hq').value='';homeLoad()};
+$('hx').onclick=closeHome;
+$('hs').onclick=()=>{hTab='rooms';homeRender()};$('hc').onclick=()=>{hTab='contacts';homeRender()};
+$('hq').addEventListener('input',homeRender);
+$('hq').addEventListener('keydown',e=>{if(e.key==='Enter'&&hTab==='rooms'&&$('hq').value.trim())joinRoom(slug($('hq').value))});
+$('hgo').onclick=()=>{if($('hq').value.trim())joinRoom(slug($('hq').value))};
 
 /* ---------- Appel vidéo (WebRTC + signalisation Supabase Realtime) ---------- */
 const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
