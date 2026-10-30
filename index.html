@@ -369,6 +369,71 @@ $('hq').addEventListener('input',homeRender);
 $('hq').addEventListener('keydown',e=>{if(e.key==='Enter'&&hTab==='rooms'&&$('hq').value.trim())joinRoom(slug($('hq').value))});
 $('hgo').onclick=()=>{if($('hq').value.trim())joinRoom(slug($('hq').value))};
 
+/* ---------- Signaler un problème ---------- */
+$('rp').onclick=()=>{$('rpa').value='';$('rpt').value='';$('rps').textContent='';$('rep').classList.remove('hide')};
+$('rpc').onclick=()=>$('rep').classList.add('hide');
+$('rpsend').onclick=async()=>{
+  const text=$('rpt').value.trim();if(!text){$('rps').textContent='Décrivez le problème.';return}
+  const {error}=await sb.from('reports').insert({text,about:$('rpa').value.trim()});
+  if(error){$('rps').textContent='Envoi impossible : '+error.message;return}
+  $('rps').textContent='Merci, votre signalement a été envoyé.';setTimeout(()=>$('rep').classList.add('hide'),1500);
+};
+
+/* ---------- Administration ---------- */
+let admTab='users',admUsers=[],admReports=[];
+function mk(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function btn(label,fn,danger){const b=mk('button',danger?'danger':'',label);b.onclick=fn;return b}
+async function admLoad(){
+  const al=$('al');al.textContent='Chargement…';al.style.padding='16px';
+  const u=await sb.rpc('admin_list_users');if(u.error){al.textContent='Erreur : '+u.error.message;return}admUsers=u.data;
+  const r=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(200);if(r.error){al.textContent='Erreur : '+r.error.message;return}admReports=r.data;
+  admRender();
+}
+function admRender(){
+  const al=$('al');al.textContent='';al.style.padding='0';
+  const open=admReports.filter(x=>!x.resolved).length;$('tr').textContent='Signalements'+(open?' ('+open+')':'');
+  $('tu').classList.toggle('on',admTab==='users');$('tr').classList.toggle('on',admTab==='reports');
+  $('as').classList.toggle('hide',admTab!=='users');
+  if(admTab==='users'){
+    const q=$('as').value.trim().toLowerCase();
+    const rows=admUsers.filter(x=>!q||(x.name||'').toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q));
+    if(!rows.length)al.append(mk('div','empty','Aucun utilisateur'));
+    for(const x of rows){
+      const d=mk('div','ar'),h=mk('b','',x.name);
+      if(x.adm)h.append(mk('span','bdg','Admin'));if(x.blocked)h.append(mk('span','bdg red','Bloqué'));
+      d.append(h,mk('small','',(x.email||'')+' · '+x.nb+' msg · inscrit le '+new Date(x.created_at).toLocaleDateString('fr-FR')));
+      if(!x.adm&&x.uid!==me){
+        const b=mk('div','b');
+        b.append(btn(x.blocked?'Débloquer':'Bloquer',async()=>{
+          if(!x.blocked&&!confirm('Bloquer '+x.name+' ? Il ne pourra plus lire ni écrire.'))return;
+          const r=await sb.rpc('admin_set_blocked',{p_target:x.uid,p_block:!x.blocked});if(r.error)alert(r.error.message);else admLoad()}));
+        b.append(btn('Supprimer',async()=>{
+          if(!confirm('Supprimer définitivement le compte de '+x.name+' ?'))return;
+          const purge=confirm('Supprimer aussi ses '+x.nb+' message(s) ?\nOK = oui, Annuler = conserver les messages.');
+          const r=await sb.rpc('admin_delete_user',{p_target:x.uid,p_purge:purge});if(r.error)alert(r.error.message);else admLoad()},true));
+        d.append(b);
+      }
+      al.append(d);
+    }
+  }else{
+    if(!admReports.length)al.append(mk('div','empty','Aucun signalement'));
+    for(const x of admReports){
+      const d=mk('div','ar'+(x.resolved?' done':'')),h=mk('b','',x.name);
+      if(x.resolved)h.append(mk('span','bdg','Résolu'));
+      d.append(h,mk('small','',new Date(x.created_at).toLocaleString('fr-FR')+(x.about?' · concerne : '+x.about:'')),mk('p','',x.text));
+      const b=mk('div','b');
+      if(x.about)b.append(btn('Voir l’utilisateur',()=>{admTab='users';$('as').value=x.about;admRender()}));
+      b.append(btn(x.resolved?'Rouvrir':'Marquer résolu',async()=>{const r=await sb.from('reports').update({resolved:!x.resolved}).eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()}));
+      b.append(btn('Supprimer',async()=>{if(!confirm('Supprimer ce signalement ?'))return;const r=await sb.from('reports').delete().eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()},true));
+      d.append(b);al.append(d);
+    }
+  }
+}
+$('ad').onclick=()=>{$('adm').classList.remove('hide');admTab='users';$('as').value='';admLoad()};
+$('ax').onclick=()=>$('adm').classList.add('hide');
+$('tu').onclick=()=>{admTab='users';admRender()};$('tr').onclick=()=>{admTab='reports';admRender()};
+$('as').addEventListener('input',admRender);
+
 /* ---------- Appel vidéo (WebRTC + signalisation Supabase Realtime) ---------- */
 const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
 let cch=null,stream=null,pcs={},pend={},inCall=false,sigQ=Promise.resolve();
