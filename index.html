@@ -161,8 +161,8 @@ header #st{display:block}
 <div class="bar hide" id="bar"><input type="file" id="file" class="hide"><div class="comp"><button class="ibtn" id="clip" aria-label="Joindre un fichier"></button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea></div><button class="send" id="go" aria-label="Envoyer"></button></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-const SUPABASE_URL='COLLEZ_ICI_VOTRE_URL';
-const SUPABASE_KEY='COLLEZ_ICI_VOTRE_CLE_ANON';
+const SUPABASE_URL='https://qnvcwkhooozsebrwzclj.supabase.co';
+const SUPABASE_KEY='sb_publishable_rTLFlgvuCXetFJ0rmR9nUA_vGrlU7ZB';
 
 const $=i=>document.getElementById(i);
 function fatal(msg){['auth','head','list','bar'].forEach(i=>$(i).classList.add('hide'));$('fmsg').textContent=msg;$('fatal').classList.remove('hide')}
