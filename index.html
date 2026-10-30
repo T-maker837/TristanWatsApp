@@ -57,6 +57,7 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:#00a884;colo
 #lb iframe{width:100%;height:100%;border:0;background:#fff;border-radius:6px}
 .hide{display:none!important}
 </style></head><body>
+<div id="fatal" class="hide" style="margin:auto;padding:24px;max-width:90%;text-align:center"><h2>Le site ne peut pas démarrer</h2><p id="fmsg"></p></div>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
 <div id="auth" class="hide">
   <div style="font-size:48px">💬</div><h2 style="margin:0">Messagerie</h2>
@@ -80,16 +81,23 @@ const SUPABASE_URL='https://qnvcwkhooozsebrwzclj.supabase.co';
 const SUPABASE_KEY='sb_publishable_rTLFlgvuCXetFJ0rmR9nUA_vGrlU7ZB';
 
 const $=i=>document.getElementById(i);
-if(SUPABASE_URL.startsWith('COLLEZ')||!window.supabase){$('cfg').classList.remove('hide')}else main();
+function fatal(msg){['auth','head','list','bar'].forEach(i=>$(i).classList.add('hide'));$('fmsg').textContent=msg;$('fatal').classList.remove('hide')}
+addEventListener('error',e=>fatal('Erreur : '+(e.message||'inconnue')+' — vérifiez SUPABASE_URL et SUPABASE_KEY (guillemets, pas d’espace).'));
+if(SUPABASE_URL.startsWith('COLLEZ')||SUPABASE_KEY.startsWith('COLLEZ')){$('cfg').classList.remove('hide')}
+else if(!window.supabase){fatal('La bibliothèque Supabase n’a pas pu se charger (bloqueur de publicités ou réseau ?). Essayez en navigation privée.')}
+else main();
 
 function main(){
-const sb=supabase.createClient(new URL(SUPABASE_URL.trim()).origin,SUPABASE_KEY.trim());
+let url=SUPABASE_URL.trim();if(!/^https?:\/\//.test(url))url='https://'+url;
+try{url=new URL(url).origin}catch(_){fatal('SUPABASE_URL est invalide : elle doit ressembler à https://xxxxxxxx.supabase.co');return}
+const sb=supabase.createClient(url,SUPABASE_KEY.trim());
 let me=null,myName='',msgs=[],seen=new Set(),last=0,rm='general',first=true,reg=false,pollT=null,rtCh=null;
 const hm=t=>new Date(t).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
 const dayLabel=t=>{const d=new Date(t),n=new Date(),k=x=>x.toDateString();if(k(d)===k(n))return "Aujourd'hui";if(k(d)===k(new Date(n-864e5)))return 'Hier';return d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})};
 const slug=v=>(v.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'-').slice(0,48)||'general');
 
 /* ---------- Connexion ---------- */
+showChat(false);
 function showChat(on){['head','list','bar'].forEach(i=>$(i).classList.toggle('hide',!on));$('auth').classList.toggle('hide',on)}
 async function start(session){
   if(me)return;me=session.user.id;myName=(session.user.user_metadata||{}).name||'Anonyme';
@@ -268,4 +276,35 @@ async function makePC(id,name,init){
 }
 /* Règle anti-collision : seul l'identifiant le plus grand envoie l'offre */
 function ensurePeer(k){if(inCall&&!pcs[k]&&me>k)makePC(k,pname(k),true)}
-async function
+async function flush(id){for(const c of pend[id]||[])try{await pcs[id].addIceCandidate(c)}catch(_){}pend[id]=[]}
+async function onSig(p){
+  if(!inCall||p.to!==me)return;const id=p.from,d=p.data;
+  if(d.type==='offer'){
+    const pc=pcs[id]||await makePC(id,p.name,false);
+    await pc.setRemoteDescription(d.sdp);await flush(id);
+    await pc.setLocalDescription(await pc.createAnswer());sig(id,{type:'answer',sdp:pc.localDescription});
+  }else if(d.type==='answer'&&pcs[id]){await pcs[id].setRemoteDescription(d.sdp);await flush(id)}
+  else if(d.type==='cand'&&pcs[id]){if(pcs[id].remoteDescription)try{await pcs[id].addIceCandidate(d.c)}catch(_){}else pend[id].push(d.c)}
+}
+async function joinCall(){
+  if(inCall||!cch)return;
+  if(!navigator.mediaDevices||!window.RTCPeerConnection){alert('Appel vidéo indisponible : le site doit être en HTTPS.');return}
+  const o=others();if(o.length>=5){alert('Appel complet (6 personnes maximum).');return}
+  try{stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true})}
+  catch(_){try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){alert('Accès au micro/à la caméra refusé.');return}}
+  inCall=true;$('callbar').classList.add('hide');$('call').classList.remove('hide');tile('me',stream,true,'Moi');
+  $('cam').classList.toggle('off',!stream.getVideoTracks().length);$('mic').classList.remove('off');
+  if(!o.length)sb.from('messages').insert({room:rm,text:'📞 a lancé un appel vidéo'}).then(poll);
+  await cch.track({name:myName});o.forEach(ensurePeer);
+}
+function hang(){
+  if(!inCall)return;inCall=false;
+  if(cch)cch.untrack();Object.keys(pcs).forEach(drop);
+  if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;
+  $('grid').textContent='';$('call').classList.add('hide');banner();
+}
+function toggle(kind,btn){const ts=kind==='audio'?stream.getAudioTracks():stream.getVideoTracks();if(!ts.length)return;const on=!ts[0].enabled;ts.forEach(t=>t.enabled=on);btn.classList.toggle('off',!on)}
+$('vc').onclick=joinCall;$('cbj').onclick=joinCall;$('hang').onclick=hang;
+$('mic').onclick=e=>toggle('audio',e.currentTarget);$('cam').onclick=e=>toggle('video',e.currentTarget);
+}
+</script></body></html>
