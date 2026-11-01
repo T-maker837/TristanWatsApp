@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>TristanWhatsApp</title>
+<title>Messagerie</title>
 <style>
 :root{--bg:#efeae2;--head:#008069;--mine:#d9fdd3;--other:#fff;--text:#111b21;--sub:#667781;--bar:#f0f2f5;--chip:#e1f3fb}
 @media (prefers-color-scheme:dark){:root{--bg:#0b141a;--head:#202c33;--mine:#005c4b;--other:#202c33;--text:#e9edef;--sub:#8696a0;--bar:#202c33;--chip:#182229}}
@@ -166,11 +166,15 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 .modal .chk{display:flex;align-items:center;gap:8px;font-size:14px}
 .modal .row{display:flex;gap:8px;justify-content:flex-end;margin:0}
 .modal .row button{width:auto;height:auto;border-radius:16px;padding:8px 16px;font-size:14px}
+.mdel{float:right;width:22px;height:22px;padding:0;margin:4px 0 0 6px;background:transparent;color:inherit;opacity:.45;border-radius:50%;display:grid;place-items:center}
+.mdel:hover{opacity:1;background:var(--line)}
+.rdel{width:36px;height:36px;padding:0;background:transparent;color:#d33;display:grid;place-items:center;flex:none;border-radius:50%}
+.rdel:hover{background:var(--line)}
 </style></head><body>
 <div id="fatal" class="hide" style="margin:auto;padding:24px;max-width:90%;text-align:center"><h2>Le site ne peut pas démarrer</h2><p id="fmsg"></p></div>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
 <div id="auth" class="hide">
-  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p>Discutez avec tous vos contacts, en direct.</p>
+  <div class="logo" id="logo"></div><h2>Messagerie</h2><p>Discutez avec tous vos contacts, en direct.</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
@@ -218,8 +222,8 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <div class="bar hide" id="bar"><input type="file" id="file" class="hide"><div class="comp"><button class="ibtn" id="clip" aria-label="Joindre un fichier"></button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea></div><button class="send" id="go" aria-label="Envoyer"></button></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-const SUPABASE_URL='https://qnvcwkhooozsebrwzclj.supabase.co/rest/v1/';
-const SUPABASE_KEY='sb_publishable_rTLFlgvuCXetFJ0rmR9nUA_vGrlU7ZB';
+const SUPABASE_URL='COLLEZ_ICI_VOTRE_URL';
+const SUPABASE_KEY='COLLEZ_ICI_VOTRE_CLE_ANON';
 
 const $=i=>document.getElementById(i);
 function fatal(msg){['auth','head','list','bar'].forEach(i=>$(i).classList.add('hide'));$('fmsg').textContent=msg;$('fatal').classList.remove('hide')}
@@ -238,7 +242,7 @@ const dayLabel=t=>{const d=new Date(t),n=new Date(),k=x=>x.toDateString();if(k(d
 const slug=v=>(v.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'-').slice(0,48)||'general');
 
 /* ---------- Icônes, avatars ---------- */
-const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
+const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
 const ico=(n,f,s)=>'<svg viewBox="0 0 24 24" width="'+(s||22)+'" height="'+(s||22)+'" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+P[n]+'</svg>';
 [['rb','chat'],['vc','video'],['ac','user'],['ad','shield'],['acx','close'],['clip','clip'],['go','send',1],['hx','close'],['ax','close'],['mic','mic'],['cam','video'],['hang','hang'],['logo','chat',1,34]].forEach(([i,n,f,s])=>{const e=$(i);if(e)e.innerHTML=ico(n,f,s)});
 $('rp').innerHTML=ico('flag')+'<span>Signaler un problème</span>';$('out').innerHTML=ico('logout')+'<span>Se déconnecter</span>';
@@ -314,7 +318,7 @@ async function start(session){
 async function loadStatus(){
   const {data,error}=await sb.rpc('my_status');if(error||!data||!data[0])return true;
   if(data[0].is_blk){alert('Votre compte a été bloqué par un administrateur.');sb.auth.signOut();return false}
-  isAdmin=!!data[0].is_adm;$('ad').classList.toggle('hide',!isAdmin);return true;
+  const was=isAdmin;isAdmin=!!data[0].is_adm;$('ad').classList.toggle('hide',!isAdmin);if(was!==isAdmin&&me)render();return true;
 }
 function stopAll(){localStorage.removeItem('prefs');prefs={...DEF};applyPrefs();if(onCh){sb.removeChannel(onCh);onCh=null}onlineSet=new Set();$('home').classList.add('hide');me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep','acc','um'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
 sb.auth.onAuthStateChange((ev,s)=>{if(s&&!me)start(s);else if(!s&&me)stopAll()});
@@ -389,10 +393,28 @@ function render(){
         const s=document.createElement('small');s.textContent=Math.max(1,Math.round(f.size/1024))+' Ko'+(pdf?' · Aperçu':'');a.append(s);
         a.onclick=()=>pdf?view(f):dl(f);el.append(a)}}
     if(m.text)el.append(document.createTextNode(m.text));
+    if(isAdmin){const b=mk('button','mdel');b.innerHTML=ico('trash',0,14);b.title='Supprimer ce message';b.setAttribute('aria-label','Supprimer ce message');b.onclick=()=>delMsg(m);el.append(b)}
     el.append(mk('span','t',hm(ts)));row.append(el);l.append(row);prev=m;pts=ts;
   }
   shown=msgs[msgs.length-1].id;
   if(stick){l.scrollTop=l.scrollHeight;first=false}
+}
+function removeMsg(id){const i=msgs.findIndex(m=>m.id===id);if(i<0)return;msgs.splice(i,1);seen.delete(id);render()}
+async function delMsg(m){
+  if(!confirm('Supprimer ce message pour tout le monde ?'))return;
+  const {data,error}=await sb.from('messages').delete().eq('id',m.id).select();
+  if(error){alert(error.message);return}
+  if(!data||!data.length){alert('Suppression refusée (exécutez moderation.sql dans Supabase).');return}
+  removeMsg(m.id);if(m.file)sb.storage.from('files').remove([m.file.path]);
+}
+async function delRoom(name,nb){
+  const label=name==='general'?'Vider le salon « general » ('+nb+' message(s)) ?':'Supprimer le salon « '+name+' » et ses '+nb+' message(s) ?';
+  if(!confirm(label+'\nCette action est définitive.'))return;
+  const {data,error}=await sb.rpc('admin_delete_room',{p_room:name});
+  if(error){alert(error.message);return}
+  for(let i=0;i<(data||[]).length;i+=100)sb.storage.from('files').remove(data.slice(i,i+100));
+  if(rm===name){msgs=[];seen.clear();last=0;shown=0;first=true;render()}
+  homeLoad();
 }
 function addMsgs(rows,r){
   if(r!==rm)return;let ch=false;
@@ -415,7 +437,7 @@ function openRoom(id,label,pr){
   sb.from('messages').select('*').eq('room',r).order('id',{ascending:false}).limit(200).then(({data,error})=>{
     if(error){$('st').textContent='Hors ligne';return}idle();addMsgs(data,r);render()});
   if(rtCh)sb.removeChannel(rtCh);
-  rtCh=sb.channel('msgs-'+r).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room=eq.'+r},p=>addMsgs([p.new],r)).subscribe();
+  rtCh=sb.channel('msgs-'+r).on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:'room=eq.'+r},p=>addMsgs([p.new],r)).on('postgres_changes',{event:'DELETE',schema:'public',table:'messages'},p=>{if(p.old&&p.old.id!=null)removeMsg(p.old.id)}).subscribe();
   watchCall();
 }
 
@@ -461,7 +483,9 @@ function homeRender(){
   if(hTab==='rooms'){
     const s=slug(q),rows=hRooms.slice();if(!rows.some(x=>x.rname==='general'))rows.push({rname:'general',nb:0,ts_last:null,last_text:''});
     if(q&&!rows.some(x=>x.rname===s))l.append(item(s,'Créer le salon « '+s+' »','Appuyez pour le créer et le rejoindre','',()=>joinRoom(s)));
-    rows.filter(x=>!q||x.rname.includes(q)).forEach(x=>l.append(item(x.rname,'# '+x.rname+(x.rname===rm?' (actuel)':''),(x.last_text||'Aucun message').slice(0,80),(x.ts_last?hm(x.ts_last)+' · ':'')+x.nb,()=>joinRoom(x.rname))));
+    rows.filter(x=>!q||x.rname.includes(q)).forEach(x=>{const r=item(x.rname,'# '+x.rname+(x.rname===rm?' (actuel)':''),(x.last_text||'Aucun message').slice(0,80),(x.ts_last?hm(x.ts_last)+' · ':'')+x.nb,()=>joinRoom(x.rname));
+      if(isAdmin&&x.nb>0){const b=mk('button','rdel');b.innerHTML=ico('trash');b.setAttribute('aria-label','Supprimer le salon');b.onclick=e=>{e.stopPropagation();delRoom(x.rname,x.nb)};r.append(b)}
+      l.append(r)});
   }else{
     if(hContacts===null){l.append(mk('div','empty','Contacts indisponibles : exécutez contacts.sql dans Supabase.'));return}
     const rows=hContacts.filter(x=>!q||x.name.toLowerCase().includes(q)).sort((a,b)=>(onlineSet.has(b.uid)-onlineSet.has(a.uid))||a.name.localeCompare(b.name));
