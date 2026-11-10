@@ -82,7 +82,7 @@ button{border:0;border-radius:50%;width:44px;height:44px;background:var(--p);col
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b141a;--surface:#1f2c34;--head:#1f2c34;--htext:#e9edef;--other:#1f2c34;--text:#e9edef;--sub:#8696a0;--bar:#2a3942;--chip:#16262d;--line:rgba(255,255,255,.08);--shadow:0 1px 2px rgba(0,0,0,.4);--mine:color-mix(in srgb,var(--p) 42%,#1f2c34)}}
 :root[data-theme="dark"]{--bg:#0b141a;--surface:#1f2c34;--head:#1f2c34;--htext:#e9edef;--other:#1f2c34;--text:#e9edef;--sub:#8696a0;--bar:#2a3942;--chip:#16262d;--line:rgba(255,255,255,.08);--shadow:0 1px 2px rgba(0,0,0,.4);--mine:color-mix(in srgb,var(--p) 42%,#1f2c34)}
 body{max-width:820px;box-shadow:0 0 0 1px var(--line)}
-body.out{background:linear-gradient(165deg,var(--p) 0,color-mix(in srgb,var(--p) 55%,#000) 42%,var(--bg) 42%);box-shadow:none}
+body.out{background:linear-gradient(165deg,var(--oa,var(--p)) 0,var(--ob,color-mix(in srgb,var(--p) 55%,#000)) 42%,var(--bg) 42%);box-shadow:none}
 button{transition:transform .1s,background .15s,opacity .15s}button:active{transform:scale(.94)}
 header{background:var(--head);color:var(--htext);padding:8px 10px;padding-top:max(8px,env(safe-area-inset-top));gap:2px;border-bottom:1px solid var(--line)}
 .ibtn{background:transparent;color:var(--sub);width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;padding:0}
@@ -182,11 +182,23 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 #aib small{display:block;color:var(--sub);margin-top:10px;line-height:1.4}
 .tile.scr{grid-column:1/-1}.tile.scr video{object-fit:contain;background:#000}
 #ctl .act{background:var(--p)}
+#deco{position:fixed;inset:0;pointer-events:none;z-index:4}
+#auth{position:relative;z-index:5}
+.logo{position:relative}.logo::after{content:attr(data-deco);position:absolute;top:-18px;right:-12px;font-size:30px;transform:rotate(12deg);line-height:1}
+#gar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,820px);height:12px;pointer-events:none;z-index:6;
+ background-image:radial-gradient(circle at 8px 5px,#ff4d4d 0 3.5px,transparent 4.5px),radial-gradient(circle at 28px 7px,#ffd24d 0 3.5px,transparent 4.5px),radial-gradient(circle at 48px 5px,#4dff88 0 3.5px,transparent 4.5px),radial-gradient(circle at 68px 7px,#4da6ff 0 3.5px,transparent 4.5px),linear-gradient(transparent 5px,rgba(0,0,0,.3) 5px 6px,transparent 6px);
+ background-size:80px 12px;animation:tw 1.8s ease-in-out infinite}
+@keyframes tw{50%{opacity:.5}}
+#decobar{display:flex;align-items:center;gap:8px;padding:3px 6px 3px 12px;background:linear-gradient(90deg,var(--oa,var(--p)),var(--ob,var(--p)));color:#fff;font-size:13px;font-weight:600}
+#decobar span{flex:1;text-align:center}#decobar .ibtn{color:#fff;width:28px;height:28px;font-size:18px;line-height:1}
+.chk{display:flex;align-items:center;gap:8px;cursor:pointer}.chk input[type=checkbox]{width:18px;height:18px;padding:0;accent-color:var(--p)}
+@media (prefers-reduced-motion:reduce){#gar{animation:none}}
 </style></head><body>
+<canvas id="deco" class="hide" aria-hidden="true"></canvas><div id="gar" class="hide" aria-hidden="true"></div>
 <div id="fatal" class="hide" style="margin:auto;padding:24px;max-width:90%;text-align:center"><h2>Le site ne peut pas démarrer</h2><p id="fmsg"></p></div>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
 <div id="auth" class="hide">
-  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p>La messagerie sécur de la voix simpatique: clafouti, jacasser.🫪🫠🫩🦖 (je suis un gros copieur c'est une copie de WhatsApp)</p>
+  <div class="logo" id="logo"></div><h2>Messagerie</h2><p id="authp">Discutez avec tous vos contacts, en direct.</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
@@ -199,6 +211,7 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
   <div class="who" id="who"><div class="av" id="hav"></div><div class="wt"><b id="title">general</b><small id="st">…</small></div></div>
   <button class="ibtn" id="vc" aria-label="Appel vidéo"></button><button class="ibtn hide" id="ad" aria-label="Administration"></button><button class="ibtn" id="ac" aria-label="Mon compte"></button>
 </header>
+<div id="decobar" class="hide"><span id="dbt"></span><button class="ibtn" id="dbx" aria-label="Masquer">×</button></div>
 <div id="home" class="hide"><div class="top"><button class="ibtn" id="hx" aria-label="Fermer"></button><b>Conversations</b></div>
 <div class="tabs"><button id="hs" class="on">Salons</button><button id="hc">Contacts</button></div>
 <div class="srch"><input id="hq" placeholder="Rechercher ou créer un salon"><button class="pill" id="hgo">Rejoindre</button></div><div id="hl"></div></div>
@@ -224,12 +237,16 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <label class="chk"><input type="checkbox" id="uma"> Administrateur</label><small id="ums"></small>
 <div class="row"><button id="umc" style="background:#667781">Annuler</button><button id="umok">Enregistrer</button></div></div></div>
 <div id="adm" class="hide"><div class="top"><b>Administration</b><a id="ax" aria-label="Fermer">×</a></div>
-<div class="tabs"><button id="tu" class="on">Utilisateurs</button><button id="tr">Signalements</button></div>
+<div class="tabs"><button id="tu" class="on">Utilisateurs</button><button id="tr">Signalements</button><button id="td">Décorations</button></div>
 <div class="srch" id="asw"><input id="as" placeholder="Rechercher un utilisateur…"><button class="pill" id="auc">＋ Créer</button></div><div id="al"></div></div>
 <div id="rep" class="hide"><div class="card"><b>Signaler un problème</b>
 <input id="rpa" maxlength="48" placeholder="Pseudo concerné (facultatif)">
 <textarea id="rpt" rows="4" maxlength="2000" placeholder="Décrivez le problème"></textarea>
 <small id="rps"></small><div class="row"><button id="rpc" style="background:#667781">Annuler</button><button id="rpsend">Envoyer</button></div></div></div>
+<div id="pv" class="hide modal"><div class="card"><b>Envoyer cette image ?</b>
+<img id="pvi" alt="Aperçu" style="max-width:100%;max-height:45vh;border-radius:10px;object-fit:contain;align-self:center">
+<input id="pvc" type="text" placeholder="Légende (facultatif)" maxlength="500">
+<div class="row"><button id="pvx" style="background:#667781">Annuler</button><button id="pvok">Envoyer</button></div></div></div>
 <div id="callbar" class="hide"><span id="cbt"></span><button id="cbj">Rejoindre</button></div>
 <div id="call" class="hide"><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="scr" aria-label="Partager l’écran" title="Partager l’écran"></button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
 <div id="list" class="hide"></div>
@@ -276,7 +293,7 @@ function goOnline(){
 }
 
 /* ---------- Préférences d'apparence ---------- */
-const DEF={theme:'auto',accent:'#00a884',mine:'auto',bubble:'round',fs:'m',wp:'dots',ai:false,tone:'natural'};
+const DEF={theme:'auto',accent:'#00a884',mine:'auto',bubble:'round',fs:'m',wp:'dots',ai:false,tone:'natural',deco:true};
 let prefs={...DEF};try{prefs={...DEF,...JSON.parse(localStorage.getItem('prefs')||'{}')}}catch(_){}
 const lum=h=>{const n=parseInt(h.slice(1),16),f=v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)};return .2126*f(n>>16)+.7152*f(n>>8&255)+.0722*f(n&255)};
 const HEX=/^#[0-9a-f]{6}$/i;
@@ -292,8 +309,8 @@ function applyPrefs(){
 applyPrefs();
 let prefT=null;
 function savePrefs(){localStorage.setItem('prefs',JSON.stringify(prefs));clearTimeout(prefT);prefT=setTimeout(()=>{if(me)sb.rpc('save_settings',{p_settings:prefs})},600)}
-function setPref(k,v){prefs[k]=v;applyPrefs();savePrefs();buildAppearance();if(k==='ai')render();if(k==='ai'||k==='tone')buildAI()}
-const OPT={theme:[['auto','Auto'],['light','Clair'],['dark','Sombre']],bubble:[['round','Arrondi'],['soft','Doux'],['square','Carré'],['flat','Plat']],fs:[['s','Petit'],['m','Normal'],['l','Grand']],wp:[['dots','Points'],['plain','Uni'],['grad','Dégradé']]};
+function setPref(k,v){prefs[k]=v;applyPrefs();savePrefs();buildAppearance();if(k==='ai')render();if(k==='ai'||k==='tone')buildAI();if(k==='deco')applyDeco()}
+const OPT={theme:[['auto','Auto'],['light','Clair'],['dark','Sombre']],bubble:[['round','Arrondi'],['soft','Doux'],['square','Carré'],['flat','Plat']],fs:[['s','Petit'],['m','Normal'],['l','Grand']],wp:[['dots','Points'],['plain','Uni'],['grad','Dégradé']],deco:[[true,'Activées'],[false,'Désactivées']]};
 const ACC=['#00a884','#1e88e5','#8e24aa','#e91e63','#f57c00','#00897b','#5c6bc0','#455a64'];
 const MINE=['auto','#d9fdd3','#dbeafe','#fce7f3','#fef3c7','#005c4b','#1e3a8a','#831843','#7c2d12'];
 function swatches(k,list){
@@ -306,7 +323,7 @@ function buildAppearance(){
   const sec=(t,n)=>box.append(mk('label','',t),n);
   const seg=(k)=>{const g=mk('div','seg');OPT[k].forEach(([v,t])=>{const b=mk('button',prefs[k]===v?'on':'',t);b.onclick=()=>setPref(k,v);g.append(b)});return g};
   sec('Thème',seg('theme'));sec('Couleur principale',swatches('accent',ACC));sec('Couleur de mes bulles',swatches('mine',MINE));
-  sec('Style des bulles',seg('bubble'));sec('Taille du texte',seg('fs'));sec('Fond de la discussion',seg('wp'));
+  sec('Style des bulles',seg('bubble'));sec('Taille du texte',seg('fs'));sec('Fond de la discussion',seg('wp'));sec('Décorations de saison et de fêtes',seg('deco'));
 }
 const accMsg=t=>{$('acmsg').textContent=t};
 function openAcc(){
@@ -325,14 +342,185 @@ $('acps').onclick=async()=>{
 };
 $('acreset').onclick=()=>{prefs={...DEF};applyPrefs();savePrefs();buildAppearance();buildAI();render()};
 
+/* ---------- Coller une image dans la zone de saisie ---------- */
+let pvFile=null,pvUrl=null;
+function askImage(f){
+  const ext=(f.type.split('/')[1]||'png').replace('jpeg','jpg'),d=new Date(),p=n=>String(n).padStart(2,'0');
+  const name=(f.name&&f.name!=='image.png')?f.name:'capture-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds())+'.'+ext;
+  pvFile=new File([f],name,{type:f.type});pvUrl=URL.createObjectURL(pvFile);
+  $('pvi').src=pvUrl;$('pvc').value=$('in').value.trim();$('pv').classList.remove('hide');setTimeout(()=>$('pvc').focus(),50);
+}
+function closePv(){$('pv').classList.add('hide');if(pvUrl){URL.revokeObjectURL(pvUrl);pvUrl=null}$('pvi').removeAttribute('src');pvFile=null}
+$('pvx').onclick=closePv;
+$('pvok').onclick=()=>{const f=pvFile,cap=$('pvc').value.trim();closePv();if(f){$('in').value='';$('in').style.height='auto';sendFile(f,cap,false)}};
+$('pvc').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('pvok').click()}});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('pv').classList.contains('hide'))closePv()});
+$('in').addEventListener('paste',e=>{
+  const cd=e.clipboardData;if(!cd||cd.getData('text/plain'))return;
+  const it=[...cd.items].find(i=>i.kind==='file'&&/^image\/(png|jpeg|gif|webp)$/.test(i.type));
+  const f=it&&it.getAsFile();if(!f)return;
+  e.preventDefault();askImage(f);
+});
+
+/* ---------- Décorations de saison et de fêtes ---------- */
+const TT=(n,m,k,oa,ob,deco,o)=>({g:'Fêtes et jours fériés',n,m,k,oa,ob,deco,...o});
+const GS='Saisons',GC='Fêtes culturelles et religieuses';
+const TH={
+  newyear:TT('Nouvel An','🎆 Bonne année !','fireworks','#2c2c6c','#0d0d2b','🥂',{cols:['#ffd24d','#ff5a5a','#5ad1ff','#9d6bff','#ffffff']}),
+  christmas:TT('Noël','🎅 Joyeux Noël !','snow','#c0392b','#6d1a14','🎅',{lights:1}),
+  epiphany:TT('Épiphanie','👑 Bonne Épiphanie !','emoji','#d4a017','#7a5a00','👑',{em:['👑','✨']}),
+  chandeleur:TT('Chandeleur','🥞 Bonne Chandeleur !','emoji','#e0b04a','#8a5a14','🥞',{em:['🥞']}),
+  valentine:TT('Saint-Valentin','💖 Joyeuse Saint-Valentin !','rise','#e0457b','#8a1f4a','💘',{em:['❤️','💕','💖']}),
+  womensday:TT('Journée des droits des femmes','🌷 Journée internationale des droits des femmes','emoji','#9b59b6','#5b2c6f','🌷',{em:['🌷','💜']}),
+  mardigras:TT('Mardi gras','🎭 Joyeux Mardi gras !','confetti','#8e44ad','#c0392b','🎭',{cols:['#ffd24d','#ff5a5a','#5ad1ff','#9d6bff','#4dff88']}),
+  stpatrick:TT('Saint-Patrick','☘️ Happy Saint Patrick !','emoji','#2e9e4f','#145a2b','☘️',{em:['☘️','🍀']}),
+  aprilfool:TT('Poisson d’avril','🐟 Poisson d’avril !','emoji','#3498db','#1b4f72','🐟',{em:['🐟','🐠']}),
+  easter:TT('Pâques','🐣 Joyeuses Pâques !','emoji','#f0c330','#9a6a10','🐣',{em:['🥚','🐰','🐣','🌷']}),
+  may1:TT('1er mai','🌼 Bon 1er mai, fête du travail !','emoji','#27ae60','#145a32','🌼',{em:['🌼','🌿']}),
+  may8:TT('8 mai 1945','🕊️ Victoire du 8 mai 1945','rise','#3b5b92','#1c2e4f','🕊️',{em:['🕊️'],few:1}),
+  mothers:TT('Fête des mères','💐 Bonne fête des mères !','emoji','#e07aa0','#8a3a5a','💐',{em:['💐','🌹','💖']}),
+  fathers:TT('Fête des pères','👔 Bonne fête des pères !','emoji','#3b6ea5','#1b3a5f','👔',{em:['👔','🎩','⭐']}),
+  music:TT('Fête de la musique','🎶 Bonne fête de la musique !','rise','#8e44ad','#2c3e50','🎸',{em:['🎵','🎶','🎸','🥁']}),
+  bastille:TT('Fête nationale','🇫🇷 Bonne fête nationale !','fireworks','#1f3f9a','#7a1020','🇫🇷',{cols:['#2a5fd6','#ffffff','#e03232']}),
+  halloween:TT('Halloween','🎃 Joyeux Halloween !','emoji','#e67e22','#2b1b3d','🎃',{em:['🎃','🦇','👻','🕸️']}),
+  armistice:TT('Armistice 1918','🕊️ 11 novembre — Souvenons-nous','rise','#34495e','#1c2833','🕊️',{em:['🕊️'],few:1}),
+  advent:TT('Avent','🎄 Bientôt Noël…','snow','#1f7a4d','#0e3b26','🎄',{lights:1}),
+  chinese:TT('Nouvel An chinois','🧧 Bonne année du calendrier chinois !','emoji','#c0392b','#7b1a14','🏮',{em:['🏮','🧧','🐉'],g:GC}),
+  eidfitr:TT('Aïd el-Fitr','🌙 Aïd Moubarak !','emoji','#1e8449','#0b3d22','🌙',{em:['🌙','✨','🌟'],g:GC}),
+  eidadha:TT('Aïd el-Adha','🌙 Aïd Moubarak !','emoji','#1e8449','#0b3d22','🌙',{em:['🌙','✨','🌟'],g:GC}),
+  hanukkah:TT('Hanoucca','🕎 Joyeux Hanoucca !','emoji','#2e6bd6','#12306e','🕎',{em:['🕎','✨','⭐'],g:GC}),
+  ramadan:TT('Ramadan','🌙 Ramadan Moubarak','rise','#1a5276','#0b2236','🌙',{em:['🌙','⭐'],few:1,g:GC}),
+  winter:TT('Hiver','❄️ Bel hiver !','snow','#4a7bd0','#1b3a6e','⛄',{g:GS}),
+  spring:TT('Printemps','🌸 Bon printemps !','emoji','#e78ab8','#8e3b6f','🌷',{em:['🌸','🌼','🦋'],g:GS}),
+  summer:TT('Été','☀️ Bel été !','bubbles','#f5a623','#c0541c','😎',{g:GS}),
+  autumn:TT('Automne','🍂 Bel automne !','emoji','#d9822b','#7a3b12','🍁',{em:['🍂','🍁','🍃'],g:GS})
+};
+function easterOf(y){const a=y%19,b=Math.floor(y/100),c2=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c2/4),k=c2%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),da=(h+l-7*m+114)%31+1;return new Date(y,mo-1,da)}
+function calOf(d,cal,long){
+  try{const o=new Intl.DateTimeFormat('en-u-ca-'+cal,{day:'numeric',month:long?'long':'numeric'}).formatToParts(d),g=t=>(o.find(x=>x.type===t)||{}).value;
+    return{d:parseInt(g('day'),10),m:long?g('month'):parseInt(g('month'),10)}}catch(_){return null}
+}
+function candidates(d){
+  const y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate(),t=new Date(y,m-1,dd),E=easterOf(y),add=(x,n)=>new Date(x.getFullYear(),x.getMonth(),x.getDate()+n),eq=(a,b)=>+a===+b;
+  const md=(mo,da)=>m===mo&&dd===da,rng=(m1,d1,m2,d2)=>{const a=m1*100+d1,b=m2*100+d2,c2=m*100+dd;return a<=b?(c2>=a&&c2<=b):(c2>=a||c2<=b)};
+  const c=[];
+  if(rng(12,31,1,2))c.push('newyear');
+  if(rng(12,24,12,26))c.push('christmas');
+  if(md(1,6))c.push('epiphany');if(md(2,2))c.push('chandeleur');if(rng(2,13,2,14))c.push('valentine');if(md(3,8))c.push('womensday');
+  if(eq(t,add(E,-47)))c.push('mardigras');if(md(3,17))c.push('stpatrick');if(md(4,1))c.push('aprilfool');
+  if(t>=add(E,-2)&&t<=add(E,1))c.push('easter');
+  if(md(5,1))c.push('may1');if(md(5,8))c.push('may8');
+  const ls=new Date(y,4,31);ls.setDate(31-ls.getDay());
+  const js=new Date(y,5,1);js.setDate(1+(7-js.getDay())%7);
+  if(eq(t,eq(ls,add(E,49))?js:ls))c.push('mothers');
+  if(eq(t,add(js,14)))c.push('fathers');
+  if(md(6,21))c.push('music');if(rng(7,13,7,14))c.push('bastille');if(rng(10,25,10,31))c.push('halloween');if(md(11,11))c.push('armistice');
+  const ch=calOf(d,'chinese');if(ch&&((ch.m===1&&ch.d<=3)||(ch.m===12&&ch.d>=29)))c.push('chinese');
+  const hj=calOf(d,'islamic-umalqura');
+  if(hj){if(hj.m===10&&hj.d<=3)c.push('eidfitr');if(hj.m===12&&hj.d>=10&&hj.d<=12)c.push('eidadha')}
+  const he=calOf(d,'hebrew',true);if(he&&((he.m==='Kislev'&&he.d>=25)||(he.m==='Tevet'&&he.d<=2)))c.push('hanukkah');
+  if(hj&&hj.m===9)c.push('ramadan');
+  if(rng(12,1,12,23))c.push('advent');
+  if(rng(12,21,3,19))c.push('winter');else if(rng(3,20,6,20))c.push('spring');else if(rng(6,21,9,22))c.push('summer');else c.push('autumn');
+  return c;
+}
+let siteDeco={on:true,off:[]},decoPrev=null;
+function decoTheme(){
+  if(decoPrev)return decoPrev;
+  if(siteDeco.on===false||prefs.deco===false)return null;
+  for(const id of candidates(new Date()))if(TH[id]&&!(siteDeco.off||[]).includes(id))return id;
+  return null;
+}
+const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DC={cv:document.getElementById('deco'),raf:0,ps:[],fw:[],th:null,id:undefined,next:0,last:0,r:1};
+function dcSize(){const r=window.devicePixelRatio||1;DC.r=r;DC.cv.width=innerWidth*r;DC.cv.height=innerHeight*r}
+addEventListener('resize',()=>{if(DC.th)dcSize()});
+function dcStop(){cancelAnimationFrame(DC.raf);DC.raf=0;DC.th=null;DC.ps=[];DC.fw=[];const x=DC.cv.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,DC.cv.width,DC.cv.height);DC.cv.classList.add('hide')}
+function dcNew(th,init){
+  const W=innerWidth,H=innerHeight,k=th.k,up=(k==='rise'||k==='bubbles');
+  const p={x:Math.random()*W,y:init?Math.random()*H:(up?H+30:-30),ph:Math.random()*6.28,sw:.4+Math.random()*1.2};
+  if(k==='snow'){p.r=1.5+Math.random()*3;p.v=25+Math.random()*45}
+  else if(k==='bubbles'){p.r=4+Math.random()*14;p.v=-(15+Math.random()*30)}
+  else if(k==='confetti'){p.w=5+Math.random()*5;p.h=8+Math.random()*6;p.v=45+Math.random()*60;p.rot=Math.random()*6.28;p.vr=(Math.random()-.5)*6;p.c=th.cols[Math.floor(Math.random()*th.cols.length)]}
+  else{p.s=16+Math.random()*14;p.ch=th.em[Math.floor(Math.random()*th.em.length)];p.v=(k==='rise'?-1:1)*(30+Math.random()*45)}
+  return p;
+}
+function dcStart(id){
+  dcStop();const th=TH[id];if(!th||reducedMotion||th.k==='x')return;
+  DC.th=th;DC.cv.classList.remove('hide');dcSize();
+  if(th.k!=='fireworks'){const n=Math.max(10,Math.min(th.k==='bubbles'?25:60,Math.floor(innerWidth/(th.few?70:24))));for(let i=0;i<n;i++)DC.ps.push(dcNew(th,true))}
+  DC.last=performance.now();DC.next=0;DC.raf=requestAnimationFrame(dcLoop);
+}
+function dcLoop(now){
+  const th=DC.th;if(!th)return;
+  const x=DC.cv.getContext('2d'),dt=Math.min(.05,(now-DC.last)/1000),W=innerWidth,H=innerHeight;DC.last=now;
+  x.setTransform(DC.r,0,0,DC.r,0,0);x.clearRect(0,0,W,H);
+  for(let i=0;i<DC.ps.length;i++){
+    const p=DC.ps[i];p.y+=p.v*dt;p.ph+=p.sw*dt;p.x+=Math.sin(p.ph)*22*dt;
+    if((p.v>0&&p.y>H+40)||(p.v<0&&p.y<-40)){DC.ps[i]=dcNew(th,false);continue}
+    if(th.k==='snow'){x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fillStyle='rgba(255,255,255,.92)';x.fill();x.strokeStyle='rgba(120,150,190,.35)';x.lineWidth=.8;x.stroke()}
+    else if(th.k==='bubbles'){x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fillStyle='rgba(255,255,255,.14)';x.fill();x.strokeStyle='rgba(80,160,220,.45)';x.lineWidth=1;x.stroke()}
+    else if(th.k==='confetti'){p.rot+=p.vr*dt;x.save();x.translate(p.x,p.y);x.rotate(p.rot);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()}
+    else{x.save();x.translate(p.x,p.y);x.rotate(Math.sin(p.ph)*.5);x.font=p.s+'px serif';x.textAlign='center';x.textBaseline='middle';x.fillText(p.ch,0,0);x.restore()}
+  }
+  if(th.k==='fireworks'){
+    if(now>DC.next){DC.next=now+700+Math.random()*1200;const cx=W*(.15+Math.random()*.7),cy=H*(.12+Math.random()*.4);
+      for(let j=0;j<44;j++){const a=Math.random()*6.283,s=60+Math.random()*130;DC.fw.push({x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:1,c:th.cols[(Math.random()*th.cols.length)|0]})}}
+    for(let i=DC.fw.length-1;i>=0;i--){const f=DC.fw[i];f.x+=f.vx*dt;f.y+=f.vy*dt;f.vy+=90*dt;f.vx*=.99;f.l-=dt*.75;
+      if(f.l<=0){DC.fw.splice(i,1);continue}x.globalAlpha=Math.max(0,f.l);x.fillStyle=f.c;x.beginPath();x.arc(f.x,f.y,2.2,0,6.283);x.fill()}
+    x.globalAlpha=1;
+  }
+  DC.raf=requestAnimationFrame(dcLoop);
+}
+function applyDeco(){
+  const id=decoTheme(),th=id&&TH[id],r=document.documentElement.style;
+  if(th){r.setProperty('--oa',th.oa);r.setProperty('--ob',th.ob)}else{r.removeProperty('--oa');r.removeProperty('--ob')}
+  const lg=$('logo');if(lg)lg.dataset.deco=th?th.deco:'';
+  $('authp').textContent=th?th.m:'Discutez avec tous vos contacts, en direct.';
+  $('gar').classList.toggle('hide',!(th&&th.lights));
+  let dismissed=false;try{dismissed=!!sessionStorage.getItem('deco-x-'+id+'-'+new Date().toDateString())}catch(_){}
+  $('decobar').classList.toggle('hide',!(th&&me&&!dismissed));if(th)$('dbt').textContent=th.m;
+  if(DC.id!==id){DC.id=id;if(th)dcStart(id);else dcStop()}
+}
+$('dbx').onclick=()=>{try{sessionStorage.setItem('deco-x-'+decoTheme()+'-'+new Date().toDateString(),'1')}catch(_){}$('decobar').classList.add('hide')};
+async function fetchDeco(){
+  try{const {data,error}=await sb.rpc('get_public_settings');
+    if(!error&&data&&data.deco)siteDeco={on:data.deco.on!==false,off:Array.isArray(data.deco.off)?data.deco.off:[]}}catch(_){}
+  applyDeco();
+}
+function decoAdmin(al){
+  const sv=async()=>{const {error}=await sb.rpc('admin_set_setting',{p_key:'deco',p_value:{on:siteDeco.on!==false,off:siteDeco.off||[]}});
+    if(error)alert('Enregistrement impossible : '+error.message+'\n(Avez-vous exécuté seasons.sql dans Supabase ?)')};
+  const top=mk('div','ar');top.append(mk('b','','Décorations de saison et de fêtes'));
+  const g=mk('div','seg');g.style.margin='10px 0 8px';
+  [[true,'Activées'],[false,'Désactivées']].forEach(([v,t])=>{const b=mk('button',(siteDeco.on!==false)===v?'on':'',t);
+    b.onclick=async()=>{siteDeco.on=v;applyDeco();await sv();admRender()};g.append(b)});
+  const cur=decoTheme();
+  top.append(g,mk('small','','Aujourd’hui : '+(cur?TH[cur].deco+' '+TH[cur].n:'aucune décoration')+'. Ce réglage s’applique à tout le monde, y compris l’écran de connexion ; chaque utilisateur peut aussi les masquer dans Mon compte.'));
+  if(decoPrev){const pb=btn('Arrêter l’aperçu',()=>{decoPrev=null;applyDeco();admRender()});pb.style.marginTop='10px';top.append(pb)}
+  al.append(top);
+  const groups={};for(const id in TH)(groups[TH[id].g]=groups[TH[id].g]||[]).push(id);
+  for(const gn in groups){
+    const h=mk('div','ar');h.append(mk('b','',gn));al.append(h);
+    for(const id of groups[gn]){
+      const r=mk('div','ar'),lab=mk('label','chk'),cb=document.createElement('input');cb.type='checkbox';cb.checked=!(siteDeco.off||[]).includes(id);
+      cb.onchange=async()=>{const off=new Set(siteDeco.off||[]);if(cb.checked)off.delete(id);else off.add(id);siteDeco.off=[...off];applyDeco();await sv()};
+      lab.append(cb,document.createTextNode(' '+TH[id].deco+' '+TH[id].n));
+      const b=mk('div','b');b.append(btn('Aperçu',()=>{decoPrev=id;applyDeco();admRender()}));r.append(lab,b);al.append(r);
+    }
+  }
+}
+fetchDeco();setInterval(fetchDeco,300000);
+
 /* ---------- Connexion ---------- */
 showChat(false);
-function showChat(on){document.body.classList.toggle('out',!on);['head','list','bar'].forEach(i=>$(i).classList.toggle('hide',!on));$('auth').classList.toggle('hide',on)}
+function showChat(on){document.body.classList.toggle('out',!on);applyDeco();['head','list','bar'].forEach(i=>$(i).classList.toggle('hide',!on));$('auth').classList.toggle('hide',on)}
 async function start(session){
   if(me)return;me=session.user.id;myName=(session.user.user_metadata||{}).name||'Anonyme';myEmail=session.user.email||'';sb.rpc('my_settings').then(({data})=>{if(data&&Object.keys(data).length){prefs={...DEF,...data};localStorage.setItem('prefs',JSON.stringify(prefs));applyPrefs()}});
   if(aiCfg.uid&&aiCfg.uid!==me)aiCfg={p:'pollinations',u:AIP.pollinations.u,m:AIP.pollinations.m,key:'',keep:true,sync:false};
   aiCfg.uid=me;saveAi(true);
   sb.rpc('my_ai_cfg').then(({data})=>{if(data&&/^https:\/\//.test(data.u||'')){aiCfg={...aiCfg,p:AIP[data.p]?data.p:'custom',u:data.u,m:data.m||'',key:data.key||'',sync:true};saveAi(true);if(!$('acc').classList.contains('hide'))buildAI()}});
+  fetchDeco();
   if(!(await loadStatus()))return;
   showChat(true);goOnline();const sr=localStorage.getItem('rm')||'general';openRoom(sr,localStorage.getItem('rml')||sr,localStorage.getItem('rmp')||null);
   clearInterval(pollT);pollT=setInterval(poll,4000);clearInterval(statT);statT=setInterval(loadStatus,60000);
@@ -342,7 +530,7 @@ async function loadStatus(){
   if(data[0].is_blk){alert('Votre compte a été bloqué par un administrateur.');sb.auth.signOut();return false}
   const was=isAdmin;isAdmin=!!data[0].is_adm;$('ad').classList.toggle('hide',!isAdmin);if(was!==isAdmin&&me)render();return true;
 }
-function stopAll(){if(typeof aiCfg!=='undefined'&&aiCfg.keep===false){aiCfg.key='';localStorage.removeItem('aicfg')}localStorage.removeItem('prefs');prefs={...DEF};applyPrefs();if(onCh){sb.removeChannel(onCh);onCh=null}onlineSet=new Set();$('home').classList.add('hide');me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep','acc','um'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
+function stopAll(){if(typeof aiCfg!=='undefined'&&aiCfg.keep===false){aiCfg.key='';localStorage.removeItem('aicfg')}localStorage.removeItem('prefs');prefs={...DEF};applyPrefs();if(onCh){sb.removeChannel(onCh);onCh=null}onlineSet=new Set();$('home').classList.add('hide');me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep','acc','um','pv'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
 sb.auth.onAuthStateChange((ev,s)=>{if(s&&!me)start(s);else if(!s&&me)stopAll()});
 sb.auth.getSession().then(({data})=>{booted=true;if(data.session)start(data.session);else showChat(false)});
 $('sw').onclick=()=>{reg=!reg;$('pseudo').classList.toggle('hide',!reg);$('ok').textContent=reg?'Créer le compte':'Se connecter';$('sw').textContent=reg?'Déjà un compte ? Se connecter':'Pas de compte ? Créer un compte'};
@@ -475,17 +663,17 @@ $('in').addEventListener('input',e=>{e.target.style.height='auto';e.target.style
 
 /* ---------- Fichiers ---------- */
 $('clip').onclick=()=>$('file').click();
-$('file').onchange=async e=>{
-  const f=e.target.files[0];e.target.value='';if(!f)return;
+async function sendFile(f,cap,clearInput){
   if(f.size>50*1024*1024){alert('Fichier trop volumineux (50 Mo maximum).');return}
-  $('st').textContent='Envoi…';const cap=$('in').value.trim();
+  $('st').textContent='Envoi…';
   try{
     const path=me+'/'+Date.now()+'-'+f.name.replace(/[^\w.\-]+/g,'_').slice(-80);
     let r=await sb.storage.from('files').upload(path,f,{contentType:f.type||'application/octet-stream'});if(r.error)throw r.error;
     r=await sb.from('messages').insert({room:rm,text:cap,file:{path,name:f.name,size:f.size,type:f.type}});if(r.error)throw r.error;
-    $('in').value='';idle();poll();
+    if(clearInput){$('in').value='';$('in').style.height='auto'}idle();poll();
   }catch(err){$('st').textContent='Échec : '+(err.message||'envoi')}
-};
+}
+$('file').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)sendFile(f,$('in').value.trim(),true)};
 
 /* ---------- Liens cliquables ---------- */
 const URLRE=/\b(?:https?:\/\/|www\.)[^\s<>"']+/gi;
@@ -661,6 +849,7 @@ function admRender(){
   const open=admReports.filter(x=>!x.resolved).length;$('tr').textContent='Signalements'+(open?' ('+open+')':'');
   $('tu').classList.toggle('on',admTab==='users');$('tr').classList.toggle('on',admTab==='reports');
   $('asw').classList.toggle('hide',admTab!=='users');
+  $('td').classList.toggle('on',admTab==='deco');if(admTab==='deco'){decoAdmin(al);return}
   if(admTab==='users'){
     const q=$('as').value.trim().toLowerCase();
     const rows=admUsers.filter(x=>!q||(x.name||'').toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q));
@@ -725,8 +914,8 @@ $('umok').onclick=async()=>{
   }catch(e){s.textContent=e.message||'Erreur'}
 };
 $('ad').onclick=()=>{$('adm').classList.remove('hide');admTab='users';$('as').value='';admLoad()};
-$('ax').onclick=()=>$('adm').classList.add('hide');
-$('tu').onclick=()=>{admTab='users';admRender()};$('tr').onclick=()=>{admTab='reports';admRender()};
+$('ax').onclick=()=>{$('adm').classList.add('hide');if(decoPrev){decoPrev=null;applyDeco()}};
+$('tu').onclick=()=>{admTab='users';admRender()};$('tr').onclick=()=>{admTab='reports';admRender()};$('td').onclick=()=>{admTab='deco';admRender()};
 $('as').addEventListener('input',admRender);
 
 /* ---------- Appel vidéo (WebRTC + signalisation Supabase Realtime) ---------- */
