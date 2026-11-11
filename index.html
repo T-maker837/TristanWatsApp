@@ -193,12 +193,19 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 #decobar span{flex:1;text-align:center}#decobar .ibtn{color:#fff;width:28px;height:28px;font-size:18px;line-height:1}
 .chk{display:flex;align-items:center;gap:8px;cursor:pointer}.chk input[type=checkbox]{width:18px;height:18px;padding:0;accent-color:var(--p)}
 @media (prefers-reduced-motion:reduce){#gar{animation:none}}
+#ctl{gap:10px;flex-wrap:wrap}#ctl button{width:48px;height:48px}
+.pdot{position:absolute;left:0;top:0;pointer-events:none;transition:transform .09s linear;z-index:3}
+.pdot i{display:block;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px rgba(255,255,255,.85),0 0 14px var(--c)}
+.tile .pdot span{position:absolute;left:12px;top:6px;bottom:auto;background:var(--c);color:#fff;white-space:nowrap;padding:1px 7px;border-radius:9px;font-size:12px}
+.ptron .tile.scr{cursor:crosshair;touch-action:none}
+.modal select{border-radius:10px;background:var(--other);border:1px solid rgba(128,128,128,.3);padding:10px;color:var(--text);font:inherit}
+#rcm .row{flex-wrap:wrap}#rcm ol{margin:0;padding-left:20px;font-size:14px;line-height:1.5}
 </style></head><body>
 <canvas id="deco" class="hide" aria-hidden="true"></canvas><div id="gar" class="hide" aria-hidden="true"></div>
 <div id="fatal" class="hide" style="margin:auto;padding:24px;max-width:90%;text-align:center"><h2>Le site ne peut pas démarrer</h2><p id="fmsg"></p></div>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
 <div id="auth" class="hide">
-  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">La messagerie sécur de la voix simpathique.</p>
+  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">La messagerie sécur de la voix simpathique</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
@@ -237,7 +244,7 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <label class="chk"><input type="checkbox" id="uma"> Administrateur</label><small id="ums"></small>
 <div class="row"><button id="umc" style="background:#667781">Annuler</button><button id="umok">Enregistrer</button></div></div></div>
 <div id="adm" class="hide"><div class="top"><b>Administration</b><a id="ax" aria-label="Fermer">×</a></div>
-<div class="tabs"><button id="tu" class="on">Utilisateurs</button><button id="tr">Signalements</button><button id="td">Décorations</button></div>
+<div class="tabs"><button id="tu" class="on">Utilisateurs</button><button id="tr">Signalements</button><button id="td">Déco</button></div>
 <div class="srch" id="asw"><input id="as" placeholder="Rechercher un utilisateur…"><button class="pill" id="auc">＋ Créer</button></div><div id="al"></div></div>
 <div id="rep" class="hide"><div class="card"><b>Signaler un problème</b>
 <input id="rpa" maxlength="48" placeholder="Pseudo concerné (facultatif)">
@@ -247,8 +254,14 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <img id="pvi" alt="Aperçu" style="max-width:100%;max-height:45vh;border-radius:10px;object-fit:contain;align-self:center">
 <input id="pvc" type="text" placeholder="Légende (facultatif)" maxlength="500">
 <div class="row"><button id="pvx" style="background:#667781">Annuler</button><button id="pvok">Envoyer</button></div></div></div>
+<div id="rcm" class="hide modal"><div class="card" style="max-height:88vh;overflow:auto"><b>Contrôle à distance</b>
+<small>Le partage d’écran d’un navigateur est en lecture seule : un site web ne peut pas prendre la main sur un ordinateur. Pour contrôler l’ordinateur de quelqu’un, il faut un outil dédié. Cette fenêtre vous guide et peut envoyer les instructions dans la discussion.</small>
+<div class="seg" id="rcr"></div><select id="rct" aria-label="Outil"></select><div id="rcs"></div>
+<input id="rcc" type="text" maxlength="60" placeholder="Code ou identifiant à communiquer (facultatif)">
+<small id="rcw"></small>
+<div class="row"><button id="rco">Ouvrir le site</button><button id="rcsend">Envoyer dans la discussion</button><button id="rcx" style="background:#667781">Fermer</button></div></div></div>
 <div id="callbar" class="hide"><span id="cbt"></span><button id="cbj">Rejoindre</button></div>
-<div id="call" class="hide"><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="scr" aria-label="Partager l’écran" title="Partager l’écran"></button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
+<div id="call" class="hide"><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="scr" aria-label="Partager l’écran" title="Partager l’écran"></button><button id="ptr" class="hide" aria-label="Pointeur" title="Montrer un point sur l’écran partagé"></button><button id="rc" aria-label="Contrôle à distance" title="Prendre le contrôle à distance"></button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
 <div id="list" class="hide"></div>
 <div class="bar hide" id="bar"><input type="file" id="file" class="hide"><div class="comp"><button class="ibtn" id="clip" aria-label="Joindre un fichier"></button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea><button class="ibtn hide" id="ai" aria-label="Suggérer une réponse avec l’IA" title="Suggérer une réponse avec l’IA"></button></div><button class="send" id="go" aria-label="Envoyer"></button></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -277,9 +290,9 @@ const dayLabel=t=>{const d=new Date(t),n=new Date(),k=x=>x.toDateString();if(k(d
 const slug=v=>(v.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'-').slice(0,48)||'general');
 
 /* ---------- Icônes, avatars ---------- */
-const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
+const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',target:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',cursor:'<path d="M5 3l14 7-6 2-2 6z"/>',screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
 const ico=(n,f,s)=>'<svg viewBox="0 0 24 24" width="'+(s||22)+'" height="'+(s||22)+'" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+P[n]+'</svg>';
-[['rb','chat'],['vc','video'],['ac','user'],['ai','spark'],['scr','screen'],['ad','shield'],['acx','close'],['clip','clip'],['go','send',1],['hx','close'],['ax','close'],['mic','mic'],['cam','video'],['hang','hang'],['logo','chat',1,34]].forEach(([i,n,f,s])=>{const e=$(i);if(e)e.innerHTML=ico(n,f,s)});
+[['rb','chat'],['vc','video'],['ac','user'],['ai','spark'],['scr','screen'],['ptr','target'],['rc','cursor'],['ad','shield'],['acx','close'],['clip','clip'],['go','send',1],['hx','close'],['ax','close'],['mic','mic'],['cam','video'],['hang','hang'],['logo','chat',1,34]].forEach(([i,n,f,s])=>{const e=$(i);if(e)e.innerHTML=ico(n,f,s)});
 $('rp').innerHTML=ico('flag')+'<span>Signaler un problème</span>';$('out').innerHTML=ico('logout')+'<span>Se déconnecter</span>';
 const hue=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.codePointAt(0))%360;return h};
 const initials=n=>(String(n).replace(/^[^\p{L}\p{N}]+/u,'').slice(0,2)||'?').toUpperCase();
@@ -937,10 +950,10 @@ const sig=(to,data)=>cch&&cch.send({type:'broadcast',event:'sig',payload:{to,fro
 function tile(id,st,muted,label){
   let t=document.getElementById('t-'+id);
   if(!t){t=document.createElement('div');t.className='tile';t.id='t-'+id;const v=document.createElement('video');v.autoplay=true;v.playsInline=true;v.muted=muted;
-    const l=document.createElement('span');l.textContent=label;t.append(v,l);$('grid').append(t)}
-  t.firstChild.srcObject=st;t.lastChild.textContent=label;t.classList.toggle('scr',scrOn.has(id));
+    const l=document.createElement('span');l.className='lbl';l.textContent=label;t.append(v,l);$('grid').append(t)}
+  t.firstChild.srcObject=st;t.querySelector('.lbl').textContent=label;t.classList.toggle('scr',scrOn.has(id));
 }
-function drop(id){if(pcs[id]){try{pcs[id].close()}catch(_){}delete pcs[id]}delete pend[id];delete vsend[id];delete remote[id];scrOn.delete(id);const t=document.getElementById('t-'+id);if(t)t.remove()}
+function drop(id){if(pcs[id]){try{pcs[id].close()}catch(_){}delete pcs[id]}delete pend[id];delete vsend[id];delete remote[id];scrOn.delete(id);if(dots[id]){dots[id].remove();delete dots[id]}syncPtr();const t=document.getElementById('t-'+id);if(t)t.remove()}
 async function makePC(id,name,init){
   const pc=new RTCPeerConnection(ICE);pcs[id]=pc;pend[id]=[];
   stream.getAudioTracks().forEach(t=>pc.addTrack(t,stream));
@@ -956,8 +969,9 @@ async function makePC(id,name,init){
 function ensurePeer(k){if(inCall&&!pcs[k]&&me>k)makePC(k,pname(k),true)}
 async function flush(id){for(const c of pend[id]||[])try{await pcs[id].addIceCandidate(c)}catch(_){}pend[id]=[]}
 async function onSig(p){
-  if(!inCall||p.to!==me)return;const id=p.from,d=p.data;
-  if(d.type==='screen'){if(d.on)scrOn.add(id);else scrOn.delete(id);const tt=document.getElementById('t-'+id);if(tt)tt.classList.toggle('scr',!!d.on);return}
+  if(!inCall||(p.to!==me&&p.to!=='*'))return;const id=p.from,d=p.data;
+  if(d.type==='ptr'){showDot(id,p.name,d.x,d.y,d.on);return}
+  if(d.type==='screen'){if(d.on)scrOn.add(id);else scrOn.delete(id);const tt=document.getElementById('t-'+id);if(tt)tt.classList.toggle('scr',!!d.on);syncPtr();return}
   if(d.type==='offer'){
     const pc=pcs[id]||await makePC(id,p.name,false);
     await pc.setRemoteDescription(d.sdp);await flush(id);
@@ -977,7 +991,7 @@ async function joinCall(){
   await cch.track({name:myName});o.forEach(ensurePeer);
 }
 function hang(){
-  if(!inCall)return;stopShare();inCall=false;
+  if(!inCall)return;stopShare();inCall=false;ptrOn=false;$('ptr').classList.remove('act');$('grid').classList.remove('ptron');Object.values(dots).forEach(d=>d.remove());
   if(cch)cch.untrack();Object.keys(pcs).forEach(drop);
   if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(dummyT){dummyT.stop();dummyT=null}
   $('grid').textContent='';$('call').classList.add('hide');banner();
@@ -996,7 +1010,7 @@ async function shareScreen(){
   screenStream=ds;screenTrack=ds.getVideoTracks()[0];sharing=true;screenTrack.onended=stopShare;
   Object.values(vsend).forEach(s=>s.replaceTrack(screenTrack).catch(()=>{}));
   Object.keys(pcs).forEach(id=>sig(id,{type:'screen',on:true}));
-  scrOn.add('me');tile('me',ds,true,'Mon écran');$('scr').classList.add('act');
+  scrOn.add('me');tile('me',ds,true,'Mon écran');$('scr').classList.add('act');syncPtr();
 }
 function stopShare(){
   if(!sharing)return;sharing=false;
@@ -1004,10 +1018,93 @@ function stopShare(){
   Object.values(vsend).forEach(s=>s.replaceTrack(cam).catch(()=>{}));
   Object.keys(pcs).forEach(id=>sig(id,{type:'screen',on:false}));
   if(screenStream)screenStream.getTracks().forEach(t=>t.stop());screenStream=null;screenTrack=null;
-  scrOn.delete('me');if(stream)tile('me',stream,true,'Moi');$('scr').classList.remove('act');
+  scrOn.delete('me');if(stream)tile('me',stream,true,'Moi');$('scr').classList.remove('act');syncPtr();
 }
 $('scr').onclick=shareScreen;
 if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)$('scr').classList.add('hide');
+/* ---------- Pointeur sur l'écran partagé ---------- */
+let ptrOn=false,ptrLast=0;const dots={};
+function syncPtr(){
+  const any=scrOn.size>0;$('ptr').classList.toggle('hide',!any);
+  if(!any&&ptrOn){ptrOn=false;$('ptr').classList.remove('act');$('grid').classList.remove('ptron')}
+}
+function ptrSend(data){if(cch)cch.send({type:'broadcast',event:'sig',payload:{to:'*',from:me,name:myName,data}})}
+function contentBox(t){
+  const v=t.firstChild,vw=v.videoWidth,vh=v.videoHeight;if(!vw||!vh)return null;
+  const bw=t.clientWidth,bh=t.clientHeight,s=Math.min(bw/vw,bh/vh),w=vw*s,h=vh*s;return{ox:(bw-w)/2,oy:(bh-h)/2,w,h};
+}
+function showDot(from,name,x,y,on){
+  const tid=sharing?'me':[...scrOn].find(i=>i!=='me'),t=tid&&document.getElementById('t-'+tid);
+  let d=dots[from];
+  if(!on||!t||typeof x!=='number'||typeof y!=='number'){if(d){d.remove();delete dots[from]}return}
+  const b=contentBox(t);if(!b)return;
+  if(!d||d.parentNode!==t){
+    if(d)d.remove();d=mk('div','pdot');d.append(mk('i'),mk('span','',String(name||'').slice(0,24)));
+    d.style.setProperty('--c','hsl('+hue(name||'?')+' 80% 50%)');t.append(d);dots[from]=d;
+  }
+  d.style.transform='translate('+(b.ox+Math.max(0,Math.min(1,x))*b.w)+'px,'+(b.oy+Math.max(0,Math.min(1,y))*b.h)+'px)';
+  clearTimeout(d._t);d._t=setTimeout(()=>{d.remove();delete dots[from]},2500);
+}
+$('grid').addEventListener('pointermove',e=>{
+  if(!ptrOn||!inCall)return;
+  const t=e.target.closest&&e.target.closest('.tile.scr');if(!t)return;
+  const now=performance.now();if(now-ptrLast<90)return;
+  const b=contentBox(t);if(!b)return;
+  const r=t.getBoundingClientRect(),x=(e.clientX-r.left-b.ox)/b.w,y=(e.clientY-r.top-b.oy)/b.h;
+  if(x<0||x>1||y<0||y>1)return;
+  ptrLast=now;ptrSend({type:'ptr',x,y,on:true});
+});
+$('grid').addEventListener('pointerleave',()=>{if(ptrOn)ptrSend({type:'ptr',on:false})});
+$('ptr').onclick=()=>{
+  ptrOn=!ptrOn;$('ptr').classList.toggle('act',ptrOn);$('grid').classList.toggle('ptron',ptrOn);
+  if(!ptrOn)ptrSend({type:'ptr',on:false});
+};
+
+/* ---------- Contrôle à distance (outils dédiés, guidé) ---------- */
+const RCT={
+  crd:{n:'Chrome Remote Desktop',u:'https://remotedesktop.google.com/support',
+    help:['Ouvrez remotedesktop.google.com/support et choisissez « Fournir une assistance ».','Saisissez le code à 12 chiffres donné par la personne, puis connectez-vous.'],
+    ask:['Ouvrez remotedesktop.google.com/support (une extension Chrome est à installer la première fois) et choisissez « Partager cet écran ».','Générez le code et communiquez-le à la personne qui vous aide.','Acceptez la demande de connexion quand elle apparaît.']},
+  qa:{n:'Assistance rapide (Windows)',u:'',
+    help:['Appuyez sur Ctrl + Windows + Q (ou cherchez « Assistance rapide »), puis choisissez « Aider quelqu’un ».','Connectez-vous avec un compte Microsoft : un code à 6 chiffres (valable quelques minutes) est généré. Communiquez-le à la personne.','Quand elle accepte le partage, demandez le contrôle total.']
+    ,ask:['Appuyez sur Ctrl + Windows + Q (ou cherchez « Assistance rapide »), puis choisissez « Obtenir de l’aide ».','Saisissez le code à 6 chiffres donné par la personne qui vous aide.','Acceptez le partage d’écran, puis autorisez le contrôle à distance.']},
+  any:{n:'AnyDesk',u:'https://anydesk.com',
+    help:['Installez et ouvrez AnyDesk.','Saisissez l’adresse AnyDesk de la personne dans « Bureau distant » et cliquez sur « Connecter ».','Demandez-lui d’accepter la connexion.'],
+    ask:['Installez et ouvrez AnyDesk.','Communiquez votre adresse AnyDesk (affichée sous « Ce bureau ») à la personne qui vous aide.','Acceptez la demande de connexion et autorisez le clavier et la souris.']},
+  tv:{n:'TeamViewer',u:'https://www.teamviewer.com',
+    help:['Installez TeamViewer.','Saisissez l’ID de la personne dans « Contrôle à distance », puis le mot de passe qu’elle vous donne.'],
+    ask:['Téléchargez et lancez TeamViewer (version QuickSupport pour une aide ponctuelle).','Communiquez votre ID et votre mot de passe à la personne qui vous aide.']},
+  rd:{n:'RustDesk (logiciel libre)',u:'https://rustdesk.com',
+    help:['Installez RustDesk.','Saisissez l’ID de la personne, puis le mot de passe qu’elle vous donne.'],
+    ask:['Installez RustDesk.','Communiquez l’ID et le mot de passe affichés dans l’application à la personne qui vous aide.','Acceptez la connexion entrante.']},
+  mac:{n:'macOS (Partage d’écran, Messages)',u:'',
+    help:['Dans l’app Messages, ouvrez la conversation avec la personne, cliquez sur son nom puis sur « Partage d’écran ».','Demandez à contrôler son écran.'],
+    ask:['Dans Messages, acceptez la demande de partage d’écran de la personne qui vous aide.','Autorisez-la à contrôler votre écran quand c’est demandé.']}
+};
+let rcRole='help';
+function rcRender(){
+  const t=RCT[$('rct').value],steps=rcRole==='help'?t.help:t.ask,s=$('rcs');s.textContent='';
+  const ol=document.createElement('ol');steps.forEach(x=>ol.append(mk('li','',x)));s.append(ol);
+  $('rco').classList.toggle('hide',!t.u);
+  $('rcw').textContent=(dm?'':'⚠️ Dans un salon, le code serait visible par tous les participants : préférez une conversation privée. ')+'Sécurité : ne donnez jamais le contrôle de votre ordinateur à quelqu’un que vous ne connaissez pas, et interrompez la session à tout moment depuis l’outil.';
+}
+for(const k in RCT){const o=document.createElement('option');o.value=k;o.textContent=RCT[k].n;$('rct').append(o)}
+[['help','Je veux aider'],['ask','Je demande de l’aide']].forEach(([v,t])=>{
+  const b=mk('button',v===rcRole?'on':'',t);b.dataset.v=v;
+  b.onclick=()=>{rcRole=v;[...$('rcr').children].forEach(x=>x.classList.toggle('on',x.dataset.v===v));rcRender()};$('rcr').append(b);
+});
+$('rct').onchange=rcRender;
+$('rc').onclick=()=>{$('rcc').value='';rcRender();$('rcm').classList.remove('hide')};
+$('rcx').onclick=()=>$('rcm').classList.add('hide');
+$('rco').onclick=()=>{const u=RCT[$('rct').value].u;if(u)window.open(u,'_blank','noopener,noreferrer')};
+$('rcsend').onclick=async()=>{
+  const t=RCT[$('rct').value],other=rcRole==='help'?t.ask:t.help,code=$('rcc').value.trim();
+  const text='🖱️ Contrôle à distance — '+t.n+'\n'+other.map((s,i)=>(i+1)+'. '+s).join('\n')+(code?'\nCode / identifiant : '+code:'')+'\n⚠️ N’acceptez que si vous connaissez la personne ; vous pouvez interrompre à tout moment.';
+  const {error}=await sb.from('messages').insert({room:rm,text});
+  if(error){alert('Envoi impossible : '+error.message);return}
+  poll();$('rcm').classList.add('hide');alert('Instructions envoyées dans la discussion.');
+};
+
 $('vc').onclick=joinCall;$('cbj').onclick=joinCall;$('hang').onclick=hang;
 $('mic').onclick=e=>toggle('audio',e.currentTarget);$('cam').onclick=e=>toggle('video',e.currentTarget);
 }
