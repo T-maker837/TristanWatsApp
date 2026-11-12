@@ -200,12 +200,28 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 .ptron .tile.scr{cursor:crosshair;touch-action:none}
 .modal select{border-radius:10px;background:var(--other);border:1px solid rgba(128,128,128,.3);padding:10px;color:var(--text);font:inherit}
 #rcm .row{flex-wrap:wrap}#rcm ol{margin:0;padding-left:20px;font-size:14px;line-height:1.5}
+#atabs{overflow-x:auto;scrollbar-width:none}#atabs button{flex:none;white-space:nowrap;padding:12px 14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:12px 16px}
+.sc{background:var(--bar);border-radius:14px;padding:12px 14px}.sc b{display:block;font-size:22px}.sc small{color:var(--sub)}.sc.link{cursor:pointer}.sc.link:hover{outline:2px solid var(--p)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:90px;padding:0 16px}
+.bars div{flex:1;background:var(--p);border-radius:4px 4px 0 0;min-height:2px}
+.barsl{display:flex;gap:4px;padding:2px 16px 12px;font-size:10px;color:var(--sub)}.barsl span{flex:1;text-align:center}
+.chips{display:flex;gap:6px;padding:10px 16px;flex-wrap:wrap}
+.chips button{width:auto;height:auto;border-radius:16px;padding:6px 12px;font-size:13px;background:var(--bar);color:var(--text)}.chips button.on{background:var(--p);color:#fff}
+.ar.sec{font-weight:600;color:var(--p);text-transform:uppercase;font-size:12px;letter-spacing:.05em;background:var(--bar)}
+.af{display:flex;gap:8px;padding:10px 16px;flex-wrap:wrap}
+.af input,.af select,.af textarea{flex:1;min-width:120px;background:var(--bar);border:0;border-radius:12px;padding:10px 12px;color:var(--text);font:inherit}
+.af.col{flex-direction:column}.af .pill{flex:none;padding:10px 16px}
+#annbar{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;color:#fff;font-size:14px;font-weight:600;background:#1e88e5;position:relative;z-index:7}
+#annbar[data-lv=warn]{background:#f57c00}#annbar[data-lv=alert]{background:#d33}
+#annbar span{flex:1;text-align:center}#annbar .ibtn{color:#fff;width:30px;height:30px;font-size:20px}
 </style></head><body>
 <canvas id="deco" class="hide" aria-hidden="true"></canvas><div id="gar" class="hide" aria-hidden="true"></div>
+<div id="annbar" class="hide"><span id="abt"></span><button class="ibtn" id="abx" aria-label="Masquer l’annonce">×</button></div>
 <div id="fatal" class="hide" style="margin:auto;padding:24px;max-width:90%;text-align:center"><h2>Le site ne peut pas démarrer</h2><p id="fmsg"></p></div>
 <div id="cfg" class="hide"><h2>Configuration requise</h2><p>Renseignez <b>SUPABASE_URL</b> et <b>SUPABASE_KEY</b> en haut du script de <code>index.html</code> (voir le README).</p></div>
 <div id="auth" class="hide">
-  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">La messagerie sécur de la voix simpathique</p>
+  <div class="logo" id="logo"></div><h2>Messagerie</h2><p id="authp">Discutez avec tous vos contacts, en direct.</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
@@ -244,7 +260,7 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <label class="chk"><input type="checkbox" id="uma"> Administrateur</label><small id="ums"></small>
 <div class="row"><button id="umc" style="background:#667781">Annuler</button><button id="umok">Enregistrer</button></div></div></div>
 <div id="adm" class="hide"><div class="top"><b>Administration</b><a id="ax" aria-label="Fermer">×</a></div>
-<div class="tabs"><button id="tu" class="on">Utilisateurs</button><button id="tr">Signalements</button><button id="td">Déco</button></div>
+<div class="tabs" id="atabs"></div>
 <div class="srch" id="asw"><input id="as" placeholder="Rechercher un utilisateur…"><button class="pill" id="auc">＋ Créer</button></div><div id="al"></div></div>
 <div id="rep" class="hide"><div class="card"><b>Signaler un problème</b>
 <input id="rpa" maxlength="48" placeholder="Pseudo concerné (facultatif)">
@@ -496,10 +512,24 @@ function applyDeco(){
   if(DC.id!==id){DC.id=id;if(th)dcStart(id);else dcStop()}
 }
 $('dbx').onclick=()=>{try{sessionStorage.setItem('deco-x-'+decoTheme()+'-'+new Date().toDateString(),'1')}catch(_){}$('decobar').classList.add('hide')};
+let siteAnn={on:false,text:'',level:'info',until:''};
+function applyAnn(){
+  const a=siteAnn,bar=$('annbar');let show=!!(a.on&&a.text);
+  const t=new Date(),ld=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  if(show&&a.until&&ld>a.until)show=false;
+  const key='ann-x-'+(a.text||'').length+'-'+(a.text||'').slice(0,24);
+  try{if(show&&sessionStorage.getItem(key))show=false}catch(_){}
+  bar.classList.toggle('hide',!show);if(show){$('abt').textContent=a.text;bar.dataset.lv=a.level||'info'}
+}
+$('abx').onclick=()=>{const a=siteAnn;try{sessionStorage.setItem('ann-x-'+(a.text||'').length+'-'+(a.text||'').slice(0,24),'1')}catch(_){}$('annbar').classList.add('hide')};
 async function fetchDeco(){
   try{const {data,error}=await sb.rpc('get_public_settings');
-    if(!error&&data&&data.deco)siteDeco={on:data.deco.on!==false,off:Array.isArray(data.deco.off)?data.deco.off:[]}}catch(_){}
-  applyDeco();
+    if(!error&&data){
+      if(data.deco)siteDeco={on:data.deco.on!==false,off:Array.isArray(data.deco.off)?data.deco.off:[]};
+      const an=data.announce;
+      siteAnn=an&&an.text?{on:an.on!==false,text:String(an.text).slice(0,300),level:['info','warn','alert'].includes(an.level)?an.level:'info',until:String(an.until||'').slice(0,10)}:{on:false,text:'',level:'info',until:''};
+    }}catch(_){}
+  applyDeco();applyAnn();
 }
 function decoAdmin(al){
   const sv=async()=>{const {error}=await sb.rpc('admin_set_setting',{p_key:'deco',p_value:{on:siteDeco.on!==false,off:siteDeco.off||[]}});
@@ -848,56 +878,183 @@ $('rpsend').onclick=async()=>{
 };
 
 /* ---------- Administration ---------- */
-let admTab='users',admUsers=[],admReports=[];
+const ATABS=[['dash','Tableau de bord'],['users','Utilisateurs'],['rooms','Salons'],['msgs','Messages'],['reports','Signalements'],['ann','Annonce'],['deco','Décorations'],['log','Journal']];
+let admTab='dash',admUsers=[],admReports=[],admRooms=[],admMsgs=[],admLog=[],admStats=null,admUF='all',admRF='open',admRoomQ='',admMF={q:'',room:'',uid:'',uname:''};
 function mk(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 function btn(label,fn,danger){const b=mk('button',danger?'danger':'',label);b.onclick=fn;return b}
-async function admLoad(){
-  const al=$('al');al.textContent='Chargement…';al.style.padding='16px';
-  const u=await sb.rpc('admin_list_users');if(u.error){al.textContent='Erreur : '+u.error.message;return}admUsers=u.data;
-  const r=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(200);if(r.error){al.textContent='Erreur : '+r.error.message;return}admReports=r.data;
-  admRender();
+const fmtN=n=>new Intl.NumberFormat('fr-FR').format(n||0);
+const fmtB=b=>b<1024?b+' o':b<1048576?Math.round(b/1024)+' Ko':b<1073741824?(b/1048576).toFixed(1)+' Mo':(b/1073741824).toFixed(2)+' Go';
+const fdt=t=>t?new Date(t).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'—';
+const chk=r=>{if(r.error)throw new Error(r.error.message)};
+const rmFiles=p=>{for(let i=0;i<(p||[]).length;i+=100)sb.storage.from('files').remove(p.slice(i,i+100))};
+ATABS.forEach(([k,t])=>{const b=mk('button','',t);b.id='tab-'+k;b.onclick=()=>{admTab=k;admLoad(k)};$('atabs').append(b)});
+function chips(opts,cur,fn){const d=mk('div','chips');opts.forEach(([v,t])=>{const b=mk('button',v===cur?'on':'',t);b.onclick=()=>fn(v);d.append(b)});return d}
+async function admBadge(){
+  const {count}=await sb.from('reports').select('id',{count:'exact',head:true}).eq('resolved',false);
+  const b=$('tab-reports');if(b)b.textContent='Signalements'+(count?' ('+count+')':'');
+}
+async function admLoad(tab){
+  tab=tab||admTab;const al=$('al');al.textContent='Chargement…';al.style.padding='16px';
+  try{
+    if(tab==='dash'){const r=await sb.rpc('admin_stats');chk(r);admStats=r.data}
+    else if(tab==='users'){const r=await sb.rpc('admin_list_users');chk(r);admUsers=r.data}
+    else if(tab==='rooms'){const r=await sb.rpc('admin_list_rooms');chk(r);admRooms=r.data}
+    else if(tab==='msgs'){const r=await sb.rpc('admin_search_messages',{p_q:admMF.q||null,p_room:admMF.room||null,p_uid:admMF.uid||null,p_limit:100});chk(r);admMsgs=r.data}
+    else if(tab==='reports'){const r=await sb.from('reports').select('*').order('created_at',{ascending:false}).limit(200);chk(r);admReports=r.data}
+    else if(tab==='log'){const r=await sb.rpc('admin_get_log',{p_limit:200});chk(r);admLog=r.data}
+  }catch(e){al.textContent='Erreur : '+e.message+' (avez-vous exécuté admin2.sql dans Supabase ?)';return}
+  admRender();admBadge();
 }
 function admRender(){
   const al=$('al');al.textContent='';al.style.padding='0';
-  const open=admReports.filter(x=>!x.resolved).length;$('tr').textContent='Signalements'+(open?' ('+open+')':'');
-  $('tu').classList.toggle('on',admTab==='users');$('tr').classList.toggle('on',admTab==='reports');
+  ATABS.forEach(([k])=>$('tab-'+k).classList.toggle('on',admTab===k));
   $('asw').classList.toggle('hide',admTab!=='users');
-  $('td').classList.toggle('on',admTab==='deco');if(admTab==='deco'){decoAdmin(al);return}
-  if(admTab==='users'){
-    const q=$('as').value.trim().toLowerCase();
-    const rows=admUsers.filter(x=>!q||(x.name||'').toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q));
-    if(!rows.length)al.append(mk('div','empty','Aucun utilisateur'));
-    for(const x of rows){
-      const d=mk('div','ar'),h=mk('b','',x.name);
-      if(x.adm)h.append(mk('span','bdg','Admin'));if(x.blocked)h.append(mk('span','bdg red','Bloqué'));
-      d.append(h,mk('small','',(x.email||'')+' · '+x.nb+' msg · inscrit le '+new Date(x.created_at).toLocaleDateString('fr-FR')));
-      {
-        const b=mk('div','b');b.append(btn('Modifier',()=>openUM(x)));const full=!x.adm&&x.uid!==me;
-        if(full)b.append(btn(x.blocked?'Débloquer':'Bloquer',async()=>{
-          if(!x.blocked&&!confirm('Bloquer '+x.name+' ? Il ne pourra plus lire ni écrire.'))return;
-          const r=await sb.rpc('admin_set_blocked',{p_target:x.uid,p_block:!x.blocked});if(r.error)alert(r.error.message);else admLoad()}));
-        if(full)b.append(btn('Supprimer',async()=>{
-          if(!confirm('Supprimer définitivement le compte de '+x.name+' ?'))return;
-          const purge=confirm('Supprimer aussi ses '+x.nb+' message(s) ?\nOK = oui, Annuler = conserver les messages.');
-          const r=await sb.rpc('admin_delete_user',{p_target:x.uid,p_purge:purge});if(r.error)alert(r.error.message);else admLoad()},true));
-        d.append(b);
-      }
-      al.append(d);
-    }
-  }else{
-    if(!admReports.length)al.append(mk('div','empty','Aucun signalement'));
-    for(const x of admReports){
-      const d=mk('div','ar'+(x.resolved?' done':'')),h=mk('b','',x.name);
-      if(x.resolved)h.append(mk('span','bdg','Résolu'));
-      d.append(h,mk('small','',new Date(x.created_at).toLocaleString('fr-FR')+(x.about?' · concerne : '+x.about:'')),mk('p','',x.text));
-      const b=mk('div','b');
-      if(x.about)b.append(btn('Voir l’utilisateur',()=>{admTab='users';$('as').value=x.about;admRender()}));
-      b.append(btn(x.resolved?'Rouvrir':'Marquer résolu',async()=>{const r=await sb.from('reports').update({resolved:!x.resolved}).eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()}));
-      b.append(btn('Supprimer',async()=>{if(!confirm('Supprimer ce signalement ?'))return;const r=await sb.from('reports').delete().eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()},true));
-      d.append(b);al.append(d);
-    }
+  ({dash:admDash,users:admUsersView,rooms:admRoomsView,msgs:admMsgsView,reports:admReportsView,ann:admAnn,deco:decoAdmin,log:admLogView})[admTab](al);
+}
+function admDash(al){
+  const s=admStats;if(!s){al.append(mk('div','empty','Aucune donnée'));return}
+  const g=mk('div','stats');
+  const card=(n,l,fn)=>{const c=mk('div','sc'+(fn?' link':''));c.append(mk('b','',n),mk('small','',l));if(fn)c.onclick=fn;g.append(c)};
+  card(fmtN(s.users),'Utilisateurs (+'+fmtN(s.new7)+' en 7 j)',()=>{admUF='all';admTab='users';admLoad('users')});
+  card(fmtN(s.active7),'Actifs sur 7 jours');
+  card(fmtN(s.msg24),'Messages (24 h)');card(fmtN(s.msg7),'Messages (7 jours)');
+  card(fmtN(s.messages),'Messages publics');card(fmtN(s.dm_messages),'Messages privés (nombre seul)');
+  card(fmtN(s.rooms),'Salons',()=>{admTab='rooms';admLoad('rooms')});card(fmtN(s.dms),'Conversations privées');
+  card(fmtN(s.files)+' · '+fmtB(+s.bytes),'Fichiers envoyés');
+  card(fmtN(s.reports_open),'Signalements ouverts',()=>{admRF='open';admTab='reports';admLoad('reports')});
+  card(fmtN(s.blocked),'Comptes bloqués',()=>{admUF='blocked';admTab='users';admLoad('users')});card(fmtN(s.admins),'Administrateurs');
+  al.append(g);
+  const days=s.days||[],max=Math.max(1,...days.map(d=>d.n));
+  al.append(mk('div','ar sec','Messages par jour (14 derniers jours)'));
+  const bars=mk('div','bars'),lab=mk('div','barsl');
+  days.forEach(d=>{const b=mk('div');b.style.height=Math.max(2,Math.round(d.n/max*100))+'%';b.title=d.d+' : '+d.n;bars.append(b);lab.append(mk('span','',String(d.d).slice(8)))});
+  const w=mk('div');w.style.paddingTop='12px';w.append(bars,lab);al.append(w);
+  const list=(title,arr,f)=>{al.append(mk('div','ar sec',title));if(!arr||!arr.length){al.append(mk('div','ar','Aucune donnée'));return}
+    arr.forEach(x=>{const r=mk('div','ar');r.append(mk('b','',f(x)),mk('small','',x.n+' message(s)'));al.append(r)})};
+  list('Salons les plus actifs',s.top_rooms,x=>'# '+x.r);list('Utilisateurs les plus actifs (7 jours)',s.top_users,x=>x.u);
+}
+function exportUsers(rows){
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const lines=[['Pseudo','E-mail','Rôle','Statut','Inscrit le','Messages','Dernier message'].map(q).join(';')];
+  rows.forEach(x=>lines.push([x.name,x.email,x.adm?'Admin':'Utilisateur',x.blocked?'Bloqué':'Actif',new Date(x.created_at).toLocaleDateString('fr-FR'),x.nb,x.last_msg?fdt(x.last_msg):''].map(q).join(';')));
+  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='utilisateurs.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function admUsersView(al){
+  const q=$('as').value.trim().toLowerCase(),now=Date.now();
+  al.append(chips([['all','Tous'],['admin','Admins'],['blocked','Bloqués'],['idle','Inactifs 30 j']],admUF,v=>{admUF=v;admRender()}));
+  let rows=admUsers.filter(x=>!q||(x.name||'').toLowerCase().includes(q)||(x.email||'').toLowerCase().includes(q));
+  if(admUF==='admin')rows=rows.filter(x=>x.adm);else if(admUF==='blocked')rows=rows.filter(x=>x.blocked);
+  else if(admUF==='idle')rows=rows.filter(x=>!x.last_msg||now-new Date(x.last_msg)>30*864e5);
+  const top=mk('div','ar');top.append(mk('small','',rows.length+' utilisateur(s)'));
+  const tb=mk('div','b');tb.append(btn('Exporter en CSV',()=>exportUsers(rows)));top.append(tb);al.append(top);
+  if(!rows.length)al.append(mk('div','empty','Aucun utilisateur'));
+  for(const x of rows){
+    const d=mk('div','ar'),h=mk('b','',x.name);
+    if(x.adm)h.append(mk('span','bdg','Admin'));if(x.blocked)h.append(mk('span','bdg red','Bloqué'));
+    d.append(h,mk('small','',(x.email||'')+' · '+x.nb+' msg · inscrit le '+new Date(x.created_at).toLocaleDateString('fr-FR')+' · dernier message : '+(x.last_msg?fdt(x.last_msg):'jamais')));
+    const b=mk('div','b');b.append(btn('Modifier',()=>openUM(x)));
+    b.append(btn('Messages',()=>{admMF={q:'',room:'',uid:x.uid,uname:x.name};admTab='msgs';admLoad('msgs')}));
+    const full=!x.adm&&x.uid!==me;
+    if(full)b.append(btn('Effacer ses messages',async()=>{
+      if(!confirm('Effacer tous les messages publics de '+x.name+' ? Ses messages privés ne sont pas concernés.'))return;
+      const r=await sb.rpc('admin_purge_user_messages',{p_target:x.uid});if(r.error){alert(r.error.message);return}rmFiles(r.data);admLoad()},true));
+    if(full)b.append(btn(x.blocked?'Débloquer':'Bloquer',async()=>{
+      if(!x.blocked&&!confirm('Bloquer '+x.name+' ? Il ne pourra plus lire ni écrire.'))return;
+      const r=await sb.rpc('admin_set_blocked',{p_target:x.uid,p_block:!x.blocked});if(r.error)alert(r.error.message);else admLoad()}));
+    if(full)b.append(btn('Supprimer',async()=>{
+      if(!confirm('Supprimer définitivement le compte de '+x.name+' ?'))return;
+      const purge=confirm('Supprimer aussi ses '+x.nb+' message(s) ?\nOK = oui, Annuler = conserver les messages.');
+      const r=await sb.rpc('admin_delete_user',{p_target:x.uid,p_purge:purge});if(r.error)alert(r.error.message);else admLoad()},true));
+    d.append(b);al.append(d);
   }
 }
+function admRoomsView(al){
+  const f=mk('div','af'),i=document.createElement('input');i.placeholder='Filtrer les salons…';i.value=admRoomQ;f.append(i);al.append(f);
+  const box=mk('div');al.append(box);
+  function draw(){
+    box.textContent='';const q=admRoomQ.trim().toLowerCase(),rows=admRooms.filter(x=>!q||x.rname.includes(q));
+    if(!rows.length){box.append(mk('div','empty','Aucun salon'));return}
+    for(const x of rows){
+      const d=mk('div','ar'),h=mk('b','','# '+x.rname);if(x.rname[0]==='_')h.append(mk('span','bdg','Caché'));
+      d.append(h,mk('small','',x.nb+' msg · '+x.authors+' participant(s) · '+x.files+' fichier(s) · dernier : '+fdt(x.ts_last)));
+      const b=mk('div','b');
+      b.append(btn('Ouvrir',()=>{$('adm').classList.add('hide');openRoom(x.rname,x.rname)}));
+      b.append(btn('Renommer',async()=>{
+        const n=prompt('Nouveau nom du salon (minuscules, chiffres, - et _) :',x.rname);if(n===null||!n.trim())return;
+        const s=slug(n);if(s===x.rname)return;
+        if(!confirm('Renommer « '+x.rname+' » en « '+s+' » ? S’il existe déjà, les deux salons seront fusionnés.'))return;
+        const r=await sb.rpc('admin_rename_room',{p_old:x.rname,p_new:s});if(r.error)alert(r.error.message);else admLoad()}));
+      b.append(btn('Supprimer',async()=>{
+        if(!confirm('Supprimer le salon « '+x.rname+' » et ses '+x.nb+' message(s) ? Action définitive.'))return;
+        const r=await sb.rpc('admin_delete_room',{p_room:x.rname});if(r.error){alert(r.error.message);return}rmFiles(r.data);admLoad()},true));
+      d.append(b);box.append(d);
+    }
+  }
+  i.oninput=()=>{admRoomQ=i.value;draw()};draw();
+}
+function admMsgsView(al){
+  const f=mk('div','af'),q=document.createElement('input'),rr=document.createElement('input');
+  q.placeholder='Mot ou nom de fichier…';q.value=admMF.q;rr.placeholder='Salon (facultatif)';rr.value=admMF.room;
+  const go=btn('Rechercher',()=>{admMF.q=q.value.trim();admMF.room=rr.value.trim()?slug(rr.value):'';admLoad('msgs')});go.className='pill';
+  q.onkeydown=rr.onkeydown=e=>{if(e.key==='Enter')go.click()};f.append(q,rr,go);al.append(f);
+  if(admMF.uid){const c=mk('div','chips'),b=mk('button','on','Utilisateur : '+admMF.uname+' ×');b.onclick=()=>{admMF.uid='';admMF.uname='';admLoad('msgs')};c.append(b);al.append(c)}
+  const note=mk('div','ar');note.append(mk('small','','Messages publics uniquement : les conversations privées ne sont jamais accessibles. '+admMsgs.length+' résultat(s), 100 maximum, du plus récent au plus ancien.'));al.append(note);
+  for(const m of admMsgs){
+    const d=mk('div','ar'),h=mk('b','',m.name);h.append(mk('span','bdg','# '+m.room));
+    d.append(h,mk('small','',fdt(m.created_at)),mk('p','',m.text||('📎 '+((m.file&&m.file.name)||'fichier'))));
+    const b=mk('div','b');
+    b.append(btn('Ouvrir le salon',()=>{$('adm').classList.add('hide');openRoom(m.room,m.room)}));
+    b.append(btn('Supprimer',async()=>{
+      if(!confirm('Supprimer ce message ?'))return;
+      const r=await sb.from('messages').delete().eq('id',m.id).select();
+      if(r.error||!r.data||!r.data.length){alert('Suppression impossible');return}
+      if(m.file)sb.storage.from('files').remove([m.file.path]);removeMsg(m.id);admMsgs=admMsgs.filter(x=>x.id!==m.id);admRender()},true));
+    d.append(b);al.append(d);
+  }
+}
+function admReportsView(al){
+  al.append(chips([['open','Ouverts'],['done','Résolus'],['all','Tous']],admRF,v=>{admRF=v;admRender()}));
+  const rows=admReports.filter(x=>admRF==='all'||(admRF==='open'?!x.resolved:x.resolved));
+  if(!rows.length)al.append(mk('div','empty','Aucun signalement'));
+  for(const x of rows){
+    const d=mk('div','ar'+(x.resolved?' done':'')),h=mk('b','',x.name);
+    if(x.resolved)h.append(mk('span','bdg','Résolu'));
+    d.append(h,mk('small','',new Date(x.created_at).toLocaleString('fr-FR')+(x.about?' · concerne : '+x.about:'')),mk('p','',x.text));
+    const b=mk('div','b');
+    if(x.about)b.append(btn('Voir l’utilisateur',()=>{admTab='users';$('as').value=x.about;admLoad('users')}));
+    b.append(btn(x.resolved?'Rouvrir':'Marquer résolu',async()=>{const r=await sb.from('reports').update({resolved:!x.resolved}).eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()}));
+    b.append(btn('Supprimer',async()=>{if(!confirm('Supprimer ce signalement ?'))return;const r=await sb.from('reports').delete().eq('id',x.id);if(r.error)alert(r.error.message);else admLoad()},true));
+    d.append(b);al.append(d);
+  }
+}
+function admAnn(al){
+  const f=mk('div','af col'),ta=document.createElement('textarea'),lv=document.createElement('select'),un=document.createElement('input');
+  ta.rows=3;ta.maxLength=300;ta.placeholder='Message affiché à tout le monde, y compris sur l’écran de connexion (300 caractères max)';ta.value=siteAnn.text||'';
+  [['info','Information (bleu)'],['warn','Important (orange)'],['alert','Alerte (rouge)']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;if(siteAnn.level===v)o.selected=true;lv.append(o)});
+  un.type='date';un.value=siteAnn.until||'';
+  const row=mk('div','b'),save=async(on)=>{
+    const text=ta.value.trim();if(on&&!text){alert('Écrivez un message.');return}
+    const v={on,text:text||siteAnn.text||'',level:lv.value,until:un.value||''};
+    const r=await sb.rpc('admin_set_setting',{p_key:'announce',p_value:v});
+    if(r.error){alert('Enregistrement impossible : '+r.error.message+'\n(Avez-vous exécuté admin2.sql dans Supabase ?)');return}
+    siteAnn=v;applyAnn();admRender();
+  };
+  const pub=btn('Publier',()=>save(true));pub.className='pill';row.append(pub);
+  if(siteAnn.on&&siteAnn.text)row.append(btn('Retirer l’annonce',()=>save(false),true));
+  f.append(ta,lv,mk('small','','Date de fin (facultative, incluse) :'),un,mk('small','',siteAnn.on&&siteAnn.text?'✅ Une annonce est actuellement publiée.':'Aucune annonce publiée.'),row);
+  al.append(f);
+}
+const LOGL={block:'🚫 Compte bloqué',unblock:'✅ Compte débloqué',delete_user:'🗑 Compte supprimé',update_user:'✏️ Compte modifié',set_password:'🔑 Mot de passe réinitialisé',grant_admin:'🛡 Admin accordé',revoke_admin:'🛡 Admin retiré',delete_room:'🗑 Salon supprimé',rename_room:'✏️ Salon renommé',delete_message:'🗑 Message supprimé',purge_messages:'🧹 Messages effacés',setting:'⚙️ Réglage du site'};
+function admLogView(al){
+  const f=mk('div','af');const rf=btn('Actualiser',()=>admLoad('log'));rf.className='pill';f.append(rf);al.append(f);
+  if(!admLog.length)al.append(mk('div','empty','Aucune action enregistrée'));
+  for(const x of admLog){
+    const d=mk('div','ar');d.append(mk('b','',LOGL[x.action]||x.action),mk('small','',fdt(x.ts)+' · par '+(x.actor_name||'?')));
+    const t=[x.target,x.detail].filter(Boolean).join(' — ');if(t)d.append(mk('p','',t));al.append(d);
+  }
+}
+
 let umUser=null;
 function openUM(x){
   umUser=x||null;$('umt').textContent=x?'Modifier '+x.name:'Créer un utilisateur';
@@ -926,9 +1083,8 @@ $('umok').onclick=async()=>{
     setTimeout(()=>{$('um').classList.add('hide');admLoad()},900);
   }catch(e){s.textContent=e.message||'Erreur'}
 };
-$('ad').onclick=()=>{$('adm').classList.remove('hide');admTab='users';$('as').value='';admLoad()};
+$('ad').onclick=()=>{$('adm').classList.remove('hide');admTab='dash';$('as').value='';admLoad('dash')};
 $('ax').onclick=()=>{$('adm').classList.add('hide');if(decoPrev){decoPrev=null;applyDeco()}};
-$('tu').onclick=()=>{admTab='users';admRender()};$('tr').onclick=()=>{admTab='reports';admRender()};$('td').onclick=()=>{admTab='deco';admRender()};
 $('as').addEventListener('input',admRender);
 
 /* ---------- Appel vidéo (WebRTC + signalisation Supabase Realtime) ---------- */
