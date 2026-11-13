@@ -954,7 +954,7 @@ $('rpsend').onclick=async()=>{
 };
 
 /* ---------- Administration ---------- */
-const ATABS=[['dash','Tableau de bord'],['users','Users'],['rooms','Salons'],['msgs','chat'],['reports','Signal'],['ann','Pubs'],['deco','Déco'],['log','Journal'],['terms','Condit']];
+const ATABS=[['dash','Tableau de bord'],['users','Utilisateurs'],['rooms','Salons'],['msgs','Messages'],['reports','Signalements'],['ann','Annonce'],['deco','Décorations'],['log','Journal'],['terms','Conditions']];
 let admTab='dash',admUsers=[],admReports=[],admRooms=[],admMsgs=[],admLog=[],admStats=null,admUF='all',admRF='open',admRoomQ='',admMF={q:'',room:'',uid:'',uname:''};
 function mk(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 function btn(label,fn,danger){const b=mk('button',danger?'danger':'',label);b.onclick=fn;return b}
