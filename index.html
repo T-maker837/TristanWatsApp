@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Messagerie</title>
+<title>TristanWhatsApp</title>
 <style>
 :root{--bg:#efeae2;--head:#008069;--mine:#d9fdd3;--other:#fff;--text:#111b21;--sub:#667781;--bar:#f0f2f5;--chip:#e1f3fb}
 @media (prefers-color-scheme:dark){:root{--bg:#0b141a;--head:#202c33;--mine:#005c4b;--other:#202c33;--text:#e9edef;--sub:#8696a0;--bar:#202c33;--chip:#182229}}
@@ -224,6 +224,12 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 #termsf input[type=checkbox]{width:18px;height:18px;flex:none;margin-top:1px;accent-color:var(--p)}
 #termsf .row{justify-content:space-between}#termsf .row button{flex:1}
 .tlink{background:transparent;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;padding:0}
+#ctl .recon{background:#d33}
+#recbar{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:8px;padding:8px 14px;padding-top:max(8px,env(safe-area-inset-top));background:rgba(211,51,51,.92);color:#fff;font-size:13.5px;font-weight:600;z-index:2}
+#recbar .dot{width:10px;height:10px;border-radius:50%;background:#fff;animation:blink 1s step-start infinite}
+@keyframes blink{50%{opacity:.25}}
+#recbar span{flex:1}
+#recbar button{width:auto;height:auto;border-radius:12px;padding:4px 10px;font-size:12.5px;background:rgba(255,255,255,.25);color:#fff}
 </style></head><body>
 <canvas id="deco" class="hide" aria-hidden="true"></canvas><div id="gar" class="hide" aria-hidden="true"></div>
 <div id="annbar" class="hide"><span id="abt"></span><button class="ibtn" id="abx" aria-label="Masquer l’annonce">×</button></div>
@@ -232,7 +238,7 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <div id="terms" class="hide"><div class="top"><b>Conditions d’utilisation</b></div><div id="termsb"></div>
 <div id="termsf"><label><input type="checkbox" id="tok"> <span>J’ai lu et j’accepte les conditions d’utilisation, y compris la partie sur le partage d’écran et son enregistrement.</span></label><div class="row b"><button id="tclose" class="pill ghost hide">Fermer</button><button id="taccept" class="pill" disabled>Accepter et continuer</button></div></div></div>
 <div id="auth" class="hide">
-  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">La messagerie sécur de la voix sympathique 🫥🤔🤨🤑🤯🤑🤑🫡🫡😶‍🌫️ </p>
+  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">La messagerie sécur de la voix sympathique 🫥🤔🤨🤑🤯🤑🤑🫡🫡😶‍🌫️</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
@@ -291,7 +297,7 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 <small id="rcw"></small>
 <div class="row"><button id="rco">Ouvrir le site</button><button id="rcsend">Envoyer dans la discussion</button><button id="rcx" style="background:#667781">Fermer</button></div></div></div>
 <div id="callbar" class="hide"><span id="cbt"></span><button id="cbj">Rejoindre</button></div>
-<div id="call" class="hide"><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="scr" aria-label="Partager l’écran" title="Partager l’écran"></button><button id="ptr" class="hide" aria-label="Pointeur" title="Montrer un point sur l’écran partagé"></button><button id="rc" aria-label="Contrôle à distance" title="Prendre le contrôle à distance"></button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
+<div id="call" class="hide"><div id="recbar" class="hide"><span class="dot"></span><span id="recbt"></span><button id="recstop" class="hide">Arrêter mon enregistrement</button></div><div id="grid"></div><div id="ctl"><button id="mic" aria-label="Micro">🎤</button><button id="cam" aria-label="Caméra">📷</button><button id="scr" aria-label="Partager l’écran" title="Partager l’écran"></button><button id="ptr" class="hide" aria-label="Pointeur" title="Montrer un point sur l’écran partagé"></button><button id="rc" aria-label="Contrôle à distance" title="Prendre le contrôle à distance"></button><button id="rec" class="hide" aria-label="Enregistrer" title="Enregistrer l’écran partagé"></button><button id="hang" aria-label="Raccrocher">📞</button></div></div>
 <div id="list" class="hide"></div>
 <div class="bar hide" id="bar"><input type="file" id="file" class="hide"><div class="comp"><button class="ibtn" id="clip" aria-label="Joindre un fichier"></button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea><button class="ibtn hide" id="ai" aria-label="Suggérer une réponse avec l’IA" title="Suggérer une réponse avec l’IA"></button></div><button class="send" id="go" aria-label="Envoyer"></button></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -320,9 +326,9 @@ const dayLabel=t=>{const d=new Date(t),n=new Date(),k=x=>x.toDateString();if(k(d
 const slug=v=>(v.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'-').slice(0,48)||'general');
 
 /* ---------- Icônes, avatars ---------- */
-const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',target:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',cursor:'<path d="M5 3l14 7-6 2-2 6z"/>',screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',doc:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
+const P={chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',video:'<rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="m15 10 6-3v10l-6-3z"/>',flag:'<path d="M5 21V4m0 0h11l-2 4 2 4H5"/>',shield:'<path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/>',clip:'<path d="m20 11-8 8a5 5 0 0 1-7-7l8.5-8.5a3.5 3.5 0 0 1 5 5L10 17a2 2 0 0 1-3-3l7-7"/>',send:'<path d="M3 11.5 21 3l-8.5 18-2-7.5z"/>',logout:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',hang:'<path d="M3 15c5-5 13-5 18 0l-2 3-3.5-1.5v-2.5c-2-.7-5-.7-7 0v2.5L5 18z"/>',msg:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',target:'<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',cursor:'<path d="M5 3l14 7-6 2-2 6z"/>',rec:'<circle cx="12" cy="12" r="7"/>',screen:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',doc:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4.5 4.5-6.5 8-6.5s7 2 8 6.5"/>'};
 const ico=(n,f,s)=>'<svg viewBox="0 0 24 24" width="'+(s||22)+'" height="'+(s||22)+'" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+P[n]+'</svg>';
-[['rb','chat'],['vc','video'],['ac','user'],['ai','spark'],['scr','screen'],['ptr','target'],['rc','cursor'],['ad','shield'],['acx','close'],['acterms','doc'],['clip','clip'],['go','send',1],['hx','close'],['ax','close'],['mic','mic'],['cam','video'],['hang','hang'],['logo','chat',1,34]].forEach(([i,n,f,s])=>{const e=$(i);if(e)e.innerHTML=ico(n,f,s)});
+[['rb','chat'],['vc','video'],['ac','user'],['ai','spark'],['scr','screen'],['ptr','target'],['rc','cursor'],['rec','rec',1],['ad','shield'],['acx','close'],['acterms','doc'],['clip','clip'],['go','send',1],['hx','close'],['ax','close'],['mic','mic'],['cam','video'],['hang','hang'],['logo','chat',1,34]].forEach(([i,n,f,s])=>{const e=$(i);if(e)e.innerHTML=ico(n,f,s)});
 $('rp').innerHTML=ico('flag')+'<span>Signaler un problème</span>';$('out').innerHTML=ico('logout')+'<span>Se déconnecter</span>';
 const hue=s=>{let h=0;for(const ch of String(s))h=(h*31+ch.codePointAt(0))%360;return h};
 const initials=n=>(String(n).replace(/^[^\p{L}\p{N}]+/u,'').slice(0,2)||'?').toUpperCase();
@@ -1171,7 +1177,7 @@ function tile(id,st,muted,label){
     const l=document.createElement('span');l.className='lbl';l.textContent=label;t.append(v,l);$('grid').append(t)}
   t.firstChild.srcObject=st;t.querySelector('.lbl').textContent=label;t.classList.toggle('scr',scrOn.has(id));
 }
-function drop(id){if(pcs[id]){try{pcs[id].close()}catch(_){}delete pcs[id]}delete pend[id];delete vsend[id];delete remote[id];scrOn.delete(id);if(dots[id]){dots[id].remove();delete dots[id]}syncPtr();const t=document.getElementById('t-'+id);if(t)t.remove()}
+function drop(id){if(pcs[id]){try{pcs[id].close()}catch(_){}delete pcs[id]}delete pend[id];delete vsend[id];delete remote[id];scrOn.delete(id);if(recState&&recState.target===id)stopRecording(true);if(recPendingTo===id)cancelRecRequest();if(dots[id]){dots[id].remove();delete dots[id]}syncPtr();const t=document.getElementById('t-'+id);if(t)t.remove()}
 async function makePC(id,name,init){
   const pc=new RTCPeerConnection(ICE);pcs[id]=pc;pend[id]=[];
   stream.getAudioTracks().forEach(t=>pc.addTrack(t,stream));
@@ -1189,6 +1195,7 @@ async function flush(id){for(const c of pend[id]||[])try{await pcs[id].addIceCan
 async function onSig(p){
   if(!inCall||(p.to!==me&&p.to!=='*'))return;const id=p.from,d=p.data;
   if(d.type==='ptr'){showDot(id,p.name,d.x,d.y,d.on);return}
+  if(d.type==='rec-req'||d.type==='rec-ans'||d.type==='rec-state'){recHandleSig(id,p.name,d);return}
   if(d.type==='screen'){if(d.on)scrOn.add(id);else scrOn.delete(id);const tt=document.getElementById('t-'+id);if(tt)tt.classList.toggle('scr',!!d.on);syncPtr();return}
   if(d.type==='offer'){
     const pc=pcs[id]||await makePC(id,p.name,false);
@@ -1209,7 +1216,7 @@ async function joinCall(){
   await cch.track({name:myName});o.forEach(ensurePeer);
 }
 function hang(){
-  if(!inCall)return;stopShare();inCall=false;ptrOn=false;$('ptr').classList.remove('act');$('grid').classList.remove('ptron');Object.values(dots).forEach(d=>d.remove());
+  if(!inCall)return;stopShare();inCall=false;ptrOn=false;$('ptr').classList.remove('act');$('grid').classList.remove('ptron');Object.values(dots).forEach(d=>d.remove());stopRecording(true);cancelRecRequest();
   if(cch)cch.untrack();Object.keys(pcs).forEach(drop);
   if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;if(dummyT){dummyT.stop();dummyT=null}
   $('grid').textContent='';$('call').classList.add('hide');banner();
@@ -1242,9 +1249,12 @@ $('scr').onclick=shareScreen;
 if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)$('scr').classList.add('hide');
 /* ---------- Pointeur sur l'écran partagé ---------- */
 let ptrOn=false,ptrLast=0;const dots={};
+let recState=null,recPendingTo=null,recPendingTimer=null;
 function syncPtr(){
   const any=scrOn.size>0;$('ptr').classList.toggle('hide',!any);
   if(!any&&ptrOn){ptrOn=false;$('ptr').classList.remove('act');$('grid').classList.remove('ptron')}
+  $('rec').classList.toggle('hide',!any);
+  if(!any&&recState)stopRecording(true);
 }
 function ptrSend(data){if(cch)cch.send({type:'broadcast',event:'sig',payload:{to:'*',from:me,name:myName,data}})}
 function contentBox(t){
@@ -1277,6 +1287,62 @@ $('ptr').onclick=()=>{
   ptrOn=!ptrOn;$('ptr').classList.toggle('act',ptrOn);$('grid').classList.toggle('ptron',ptrOn);
   if(!ptrOn)ptrSend({type:'ptr',on:false});
 };
+
+/* ---------- Enregistrement de l'écran partagé (avec accord explicite) ---------- */
+function recMime(){return ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t))||''}
+function fileDate(){const d=new Date(),p=n=>String(n).padStart(2,'0');return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'-'+p(d.getHours())+p(d.getMinutes())}
+function startRecording(stream,mode,target,label){
+  if(!window.MediaRecorder){alert('L’enregistrement n’est pas pris en charge par ce navigateur.');return}
+  let rec;try{const m=recMime();rec=new MediaRecorder(stream,m?{mimeType:m}:undefined)}catch(_){alert('L’enregistrement n’a pas pu démarrer.');return}
+  const chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  rec.onstop=()=>{
+    if(!chunks.length)return;
+    const blob=new Blob(chunks,{type:rec.mimeType||'video/webm'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download='enregistrement-'+label.replace(/[^\w-]+/g,'_').toLowerCase()+'-'+fileDate()+'.webm';
+    document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  };
+  recState={mode,target,label,rec};rec.start(1000);
+  $('recbar').classList.remove('hide');$('recbt').textContent='Enregistrement de l’écran de '+label+' en cours';
+  $('recstop').classList.toggle('hide',mode!=='self'&&mode!=='remote');
+  $('rec').classList.add('act');
+  if(mode==='remote')sig(target,{type:'rec-state',on:true,by:myName});
+}
+function stopRecording(silent){
+  if(!recState)return;
+  const st=recState;recState=null;$('rec').classList.remove('act');$('recbar').classList.add('hide');$('recstop').classList.add('hide');
+  try{st.rec.stop()}catch(_){}
+  if(st.mode==='remote'&&!silent)sig(st.target,{type:'rec-state',on:false});
+}
+function cancelRecRequest(){if(recPendingTimer){clearTimeout(recPendingTimer);recPendingTimer=null}recPendingTo=null;$('rec').classList.remove('act')}
+$('rec').onclick=()=>{
+  if(recState){stopRecording();return}
+  if(recPendingTo)return;
+  const target=sharing?'me':[...scrOn].find(i=>i!=='me');
+  if(!target){alert('Personne ne partage son écran actuellement.');return}
+  if(target==='me'){
+    if(!confirm('Enregistrer votre propre partage d’écran ?\nLe fichier sera enregistré uniquement sur votre appareil, personne d’autre n’y a accès.'))return;
+    startRecording(screenStream,'self','me',myName);return;
+  }
+  recPendingTo=target;$('rec').classList.add('act');
+  sig(target,{type:'rec-req'});
+  recPendingTimer=setTimeout(()=>{alert('Pas de réponse à la demande d’enregistrement.');cancelRecRequest()},20000);
+};
+$('recstop').onclick=()=>stopRecording();
+function recHandleSig(from,name,d){
+  if(d.type==='rec-req'){
+    const ok=confirm(name+' demande à enregistrer votre partage d’écran. Le fichier restera sur son appareil, pas sur ce site. Autoriser ?');
+    sig(from,{type:'rec-ans',ok});
+  }else if(d.type==='rec-ans'){
+    if(recPendingTo!==from)return;cancelRecRequest();
+    if(d.ok){const s=remote[from];if(s)startRecording(s,'remote',from,name);else alert('Flux introuvable, réessayez.')}
+    else alert(name+' a refusé l’enregistrement.');
+  }else if(d.type==='rec-state'){
+    if(d.on){$('recbar').classList.remove('hide');$('recbt').textContent=(d.by||'Quelqu’un')+' enregistre votre partage d’écran';$('recstop').classList.add('hide')}
+    else if(!recState){$('recbar').classList.add('hide')}
+  }
+}
+
+
 
 /* ---------- Contrôle à distance (outils dédiés, guidé) ---------- */
 const RCT={
