@@ -182,7 +182,7 @@ html[data-wp=grad] #list,html[data-wp=grad] #prev{background-image:linear-gradie
 #aib small{display:block;color:var(--sub);margin-top:10px;line-height:1.4}
 .tile.scr{grid-column:1/-1}.tile.scr video{object-fit:contain;background:#000}
 #ctl .act{background:var(--p)}
-#deco{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,820px);pointer-events:none;z-index:4;overflow:hidden}
+#deco{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,820px);height:100vh;height:100dvh;pointer-events:none;z-index:4;overflow:hidden}
 #auth{position:relative;z-index:5}
 .logo{position:relative}.logo::after{content:attr(data-deco);position:absolute;top:-18px;right:-12px;font-size:30px;transform:rotate(12deg);line-height:1}
 #gar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(100%,820px);height:12px;pointer-events:none;z-index:6;
@@ -242,7 +242,7 @@ header::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px
 <div id="terms" class="hide"><div class="top"><b>Conditions d’utilisation</b></div><div id="termsb"></div>
 <div id="termsf"><label><input type="checkbox" id="tok"> <span>J’ai lu et j’accepte les conditions d’utilisation, y compris la partie sur le partage d’écran et son enregistrement.</span></label><div class="row b"><button id="tclose" class="pill ghost hide">Fermer</button><button id="taccept" class="pill" disabled>Accepter et continuer</button></div></div></div>
 <div id="auth" class="hide">
-  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">Discutez avec tous vos contacts, en direct.</p>
+  <div class="logo" id="logo"></div><h2>TristanWhatsApp</h2><p id="authp">L messagerie sécur de la voix sympathique.</p>
   <input id="pseudo" class="hide" placeholder="Pseudo" maxlength="24" autocomplete="nickname">
   <input id="email" type="email" placeholder="E-mail" autocomplete="email">
   <input id="pass" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
