@@ -849,7 +849,7 @@ function openRoom(id,label,pr){
   rm=id||'general';dm=rm.startsWith('dm-');peer=dm?(pr||null):null;
   const nm=dm?(label||'Contact'):rm;$('title').textContent=dm?nm:'# '+nm;paintAv($('hav'),nm);
   localStorage.setItem('rm',rm);localStorage.setItem('rml',nm);localStorage.setItem('rmp',peer||'');
-  idle();msgs=[];seen.clear();last=0;shown=0;first=true;render();markSeen(r);
+  idle();msgs=[];seen.clear();last=0;shown=0;first=true;render();markSeen(rm);
   const r=rm;
   sb.from('messages').select('*').eq('room',r).order('id',{ascending:false}).limit(200).then(({data,error})=>{
     if(error){$('st').textContent='Hors ligne';return}idle();addMsgs(data,r);render()});
