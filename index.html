@@ -321,7 +321,7 @@ header::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px
 <div class="bar hide" id="bar"><input type="file" id="file" class="hide"><div class="comp"><button class="ibtn" id="clip" aria-label="Joindre un fichier"></button><textarea id="in" rows="1" placeholder="Écrire un message"></textarea><button class="ibtn hide" id="ai" aria-label="Suggérer une réponse avec l’IA" title="Suggérer une réponse avec l’IA"></button></div><button class="send" id="go" aria-label="Envoyer"></button></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
-const SUPABASE_URL='https://qnvcwkhooozsebrwzclj.supabase.co';
+const SUPABASE_URL='https://qnvcwkhooozsebrwzclj.supabase.co/rest/v1/';
 const SUPABASE_KEY='sb_publishable_rTLFlgvuCXetFJ0rmR9nUA_vGrlU7ZB';
 
 const $=i=>document.getElementById(i);
@@ -422,14 +422,14 @@ $('acavfile').onchange=async e=>{
   if(!/^image\/(png|jpeg|webp)$/.test(f.type)){accMsg('Formats acceptés : PNG, JPEG ou WebP.');return}
   if(f.size>5*1024*1024){accMsg('Image trop volumineuse (5 Mo maximum).');return}
   accMsg('Envoi de la photo…');
-  try{
-    const ext=(f.type.split('/')[1]||'jpg').replace('jpeg','jpg'),path=me+'/avatar-'+Date.now()+'.'+ext;
-    const up=await sb.storage.from('avatars').upload(path,f,{contentType:f.type,upsert:true});if(up.error)throw up.error;
-    const r=await sb.rpc('set_my_avatar',{p_path:path});if(r.error)throw r.error;
-    const old=myAvatarPath;myAvatarPath=path;avatarUrl[me]=pubUrl(path);
-    if(old)sb.storage.from('avatars').remove([old]);
-    paintAv($('acav'),myName,me);$('acavdel').classList.remove('hide');accMsg('Photo mise à jour.');render();
-  }catch(err){accMsg('Échec : '+(err.message||'envoi impossible'))}
+  const ext=(f.type.split('/')[1]||'jpg').replace('jpeg','jpg'),path=me+'/avatar-'+Date.now()+'.'+ext;
+  const up=await sb.storage.from('avatars').upload(path,f,{contentType:f.type,upsert:true});
+  if(up.error){accMsg('Échec de l’envoi du fichier : '+up.error.message);return}
+  const r=await sb.rpc('set_my_avatar',{p_path:path});
+  if(r.error){accMsg('Fichier envoyé, mais échec de l’enregistrement sur le profil : '+r.error.message);sb.storage.from('avatars').remove([path]);return}
+  const oldPath=myAvatarPath;myAvatarPath=path;avatarUrl[me]=pubUrl(path);
+  if(oldPath)sb.storage.from('avatars').remove([oldPath]);
+  paintAv($('acav'),myName,me);$('acavdel').classList.remove('hide');accMsg('Photo mise à jour.');render();
 };
 $('acavdel').onclick=async()=>{
   if(!confirm('Retirer votre photo de profil ?'))return;
