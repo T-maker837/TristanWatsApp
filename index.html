@@ -810,7 +810,7 @@ async function loadStatus(){
   if(data[0].is_blk){alert('Votre compte a été bloqué par un administrateur.');sb.auth.signOut();return false}
   const was=isAdmin;isAdmin=!!data[0].is_adm;$('ad').classList.toggle('hide',!isAdmin);if(was!==isAdmin&&me)render();return true;
 }
-function stopAll(){if(typeof aiCfg!=='undefined'&&aiCfg.keep===false){aiCfg.key='';localStorage.removeItem('aicfg')}localStorage.removeItem('prefs');prefs={...DEF};applyPrefs();if(onCh){sb.removeChannel(onCh);onCh=null}if(globalCh){sb.removeChannel(globalCh);globalCh=null}onlineSet=new Set();$('home').classList.add('hide');me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep','acc','um','pv'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
+function stopAll(){if(typeof aiCfg!=='undefined'&&aiCfg.keep===false){aiCfg.key='';localStorage.removeItem('aicfg')}if(onCh){sb.removeChannel(onCh);onCh=null}if(globalCh){sb.removeChannel(globalCh);globalCh=null}onlineSet=new Set();$('home').classList.add('hide');me=null;isAdmin=false;$('ad').classList.add('hide');['adm','rep','acc','um','pv'].forEach(i=>$(i).classList.add('hide'));clearInterval(pollT);clearInterval(statT);if(rtCh){sb.removeChannel(rtCh);rtCh=null}hang();unwatchCall();msgs=[];seen.clear();last=0;showChat(false)}
 sb.auth.onAuthStateChange((ev,s)=>{if(s&&!me)start(s);else if(!s&&me)stopAll()});
 sb.auth.getSession().then(({data})=>{booted=true;if(data.session)start(data.session);else showChat(false)});
 $('sw').onclick=()=>{reg=!reg;$('pseudo').classList.toggle('hide',!reg);$('ok').textContent=reg?'Créer le compte':'Se connecter';$('sw').textContent=reg?'Déjà un compte ? Se connecter':'Pas de compte ? Créer un compte'};
@@ -825,7 +825,7 @@ $('ok').onclick=async()=>{
   }catch(e){$('err').textContent=e.message||'Erreur'}
 };
 $('pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('ok').click()});
-$('out').onclick=()=>sb.auth.signOut();
+$('out').onclick=async()=>{try{await sb.auth.signOut()}catch(_){}if(me)stopAll()};
 
 /* ---------- Fichiers : liens signés, aperçu, téléchargement ---------- */
 const urlCache=new Map();
@@ -877,12 +877,11 @@ async function react(m,emoji){
   const before=m.reactions||{},arr=(before[emoji]||[]).slice(),i=arr.indexOf(me);
   if(i>=0)arr.splice(i,1);else arr.push(me);
   const next={...before};if(arr.length)next[emoji]=arr;else delete next[emoji];
-  m.reactions=next;render();
+  m.reactions=next;patchMessage(m);
   const r=await sb.rpc('toggle_reaction',{p_id:m.id,p_emoji:emoji});
-  if(r.error){m.reactions=before;render();alert('Réaction impossible : '+r.error.message+' (avez-vous exécuté reactions.sql dans Supabase ?)');return}
-  m.reactions=r.data;render();
+  if(r.error){m.reactions=before;patchMessage(m);alert('Réaction impossible : '+r.error.message+' (avez-vous exécuté reactions.sql dans Supabase ?)');return}
+  m.reactions=r.data;patchMessage(m);
 }
-function applyReactionUpdate(id,reactions){const m=msgs.find(x=>x.id===id);if(!m)return;m.reactions=reactions||{};render()}
 
 /* ---------- Indicateur « en train d'écrire » ---------- */
 let typingTimer=null,lastTypingSent=0;
@@ -930,14 +929,14 @@ addEventListener('visibilitychange',()=>{if(!document.hidden&&me)markSeen(rm)});
 
 /* ---------- Messages ---------- */
 function render(){
-  const l=$('list'),near=l.scrollHeight-l.scrollTop-l.clientHeight<120,stick=near||first;l.textContent='';
+  const l=$('list'),near=l.scrollHeight-l.scrollTop-l.clientHeight<80,stick=near||first;l.textContent='';
   if(!msgs.length){const e=mk('div','empty');const i=mk('div','ei');i.innerHTML=ico('msg',0,30);e.append(i,mk('b','','Aucun message'),mk('small','','Écrivez le premier !'));l.append(e);return}
   const animate=!first;let ld='',prev=null,pts=0;
   for(const m of msgs){
     const ts=new Date(m.created_at).getTime(),dlab=dayLabel(ts);
     if(dlab!==ld){l.append(mk('div','day',dlab));ld=dlab;prev=null}
     const mine=m.uid===me,cont=!!prev&&prev.uid===m.uid&&ts-pts<5*60e3;
-    const row=mk('div','row '+(mine?'me':'other')+(cont?' cont':'')+(animate&&m.id>shown?' new':''));
+    const row=mk('div','row '+(mine?'me':'other')+(cont?' cont':'')+(animate&&m.id>shown?' new':''));row.dataset.mid=m.id;
     if(!mine&&!dm){const a=mk('div','av sm');if(cont)a.style.visibility='hidden';else paintAv(a,m.name,m.uid);row.append(a)}
     const bcol=mk('div');bcol.style.cssText='display:flex;flex-direction:column;gap:3px;max-width:100%;min-width:0;align-items:'+(mine?'flex-end':'flex-start');
     const el=mk('div','m');
@@ -1030,15 +1029,23 @@ function pollView(m){
 async function votePoll(m,optId){
   const r=await sb.rpc('vote_poll',{p_id:m.id,p_option:optId});
   if(r.error){alert('Vote impossible : '+r.error.message);return}
-  m.poll=r.data;render();
+  m.poll=r.data;patchMessage(m);
 }
 async function closePoll(m){
   if(!confirm('Clore ce sondage ? Plus personne ne pourra voter.'))return;
   const r=await sb.rpc('close_poll',{p_id:m.id});
   if(r.error){alert(r.error.message);return}
-  m.poll=r.data;render();
+  m.poll=r.data;patchMessage(m);
 }
-function applyMsgUpdate(id,row){const m=msgs.find(x=>x.id===id);if(!m)return;if('reactions' in row)m.reactions=row.reactions;if('poll' in row)m.poll=row.poll;render()}
+function applyMsgUpdate(id,row){const m=msgs.find(x=>x.id===id);if(!m)return;if('reactions' in row)m.reactions=row.reactions;if('poll' in row)m.poll=row.poll;patchMessage(m)}
+function patchMessage(m){
+  const row=document.querySelector('#list > .row[data-mid="'+m.id+'"]');
+  if(!row)return;
+  const el=row.querySelector('.m');if(!el)return;
+  if(m.poll){const old=el.querySelector('.poll');if(old)old.replaceWith(pollView(m))}
+  const bcol=el.parentElement,oldR=bcol.querySelector(':scope > .reacts');if(oldR)oldR.remove();
+  const rr=reactsRow(m);if(rr.childNodes.length)bcol.append(rr);
+}
 
 async function poll(){
   const r=rm;
